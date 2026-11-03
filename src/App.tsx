@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { CreditCard } from './types/card';
+import type { CreditCard, CardBenefits } from './types/card';
 import { getStorage, resetStorageCache } from './storage';
 import { fetchCardBenefits } from './services/aiBenefitService';
 import { getActiveAlerts, type AlertItem } from './services/notificationService';
@@ -144,16 +144,28 @@ export const App: React.FC = () => {
   }, [cards]);
 
   // Save Card (Add or Edit)
-  const handleSaveCard = async (cardData: Partial<CreditCard>) => {
+  const handleSaveCard = async (cardData: Partial<CreditCard> & { autoFetchBenefits?: boolean }) => {
     const isEdit = Boolean(editingCard);
     const cardId = editingCard ? editingCard.id : `card_${Date.now()}`;
+    const shouldFetch = cardData.autoFetchBenefits ?? true;
 
-    // 1. Fetch latest benefits (AI or Catalog)
-    const { benefits } = await fetchCardBenefits(
-      cardData.bankName || '',
-      cardData.cardName || '',
-      true
-    );
+    let cardBenefits: CardBenefits;
+    let isAi = false;
+
+    if (!shouldFetch && isEdit && editingCard?.benefits) {
+      // Re-use existing benefits instantly without any network call
+      cardBenefits = editingCard.benefits;
+      isAi = editingCard.isAiFetched ?? false;
+    } else {
+      // Fetch (with strict 7s timeout fail-safe & catalog fallback)
+      const result = await fetchCardBenefits(
+        cardData.bankName || '',
+        cardData.cardName || '',
+        shouldFetch
+      );
+      cardBenefits = result.benefits;
+      isAi = result.source === 'ai';
+    }
 
     const updatedCard: CreditCard = {
       id: cardId,
@@ -168,9 +180,9 @@ export const App: React.FC = () => {
       cardColor: cardData.cardColor,
       notes: cardData.notes,
       isFavorite: editingCard?.isFavorite || false,
-      benefits: benefits,
-      lastBenefitsFetch: new Date().toISOString(),
-      isAiFetched: true,
+      benefits: cardBenefits,
+      lastBenefitsFetch: shouldFetch ? new Date().toISOString() : (editingCard?.lastBenefitsFetch || new Date().toISOString()),
+      isAiFetched: isAi,
       createdAt: editingCard?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   CreditCard as CardIcon, 
   Plus, 
@@ -10,7 +10,8 @@ import {
   Calendar as CalendarIcon, 
   Sparkles,
   LayoutGrid,
-  WifiOff
+  WifiOff,
+  X
 } from 'lucide-react';
 import type { AlertItem } from '../services/notificationService';
 import { CONFIG } from '../config';
@@ -37,6 +38,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [showNotificationMenu, setShowNotificationMenu] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [canInstall, setCanInstall] = useState(false);
+
+  // Dismiss notification center on Escape
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setShowNotificationMenu(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showNotificationMenu) return;
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showNotificationMenu, handleKeyDown]);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -170,72 +184,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {/* Notification Center Bell */}
-            <div className="relative">
-              <button
-                onClick={() => setShowNotificationMenu(!showNotificationMenu)}
-                className="w-9 h-9 rounded-full bg-white/[0.05] hover:bg-white/[0.10] active:scale-95 text-slate-300 border border-white/[0.08] backdrop-blur-md relative transition-all flex items-center justify-center min-h-[44px] min-w-[44px]"
-                aria-label={`Billing cycle reminders: ${alerts.length} active`}
-                aria-expanded={showNotificationMenu}
-              >
-                <Bell className="w-4 h-4" aria-hidden="true" />
-                {alerts.length > 0 && (
-                  <span className={`absolute top-0 right-0 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center text-slate-950 tabular-num ${
-                    highUrgencyCount > 0 ? 'bg-rose-400 animate-pulse' : 'bg-amber-400'
-                  }`}>
-                    {alerts.length}
-                  </span>
-                )}
-              </button>
-
-              {/* Apple-Style Notification Center */}
-              {showNotificationMenu && (
-                <>
-                  {/* Backdrop for click-outside dismissal */}
-                  <div 
-                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none" 
-                    onClick={() => setShowNotificationMenu(false)}
-                    aria-hidden="true"
-                  />
-                  <div 
-                    className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-96 glass-panel rounded-3xl p-4 sm:p-5 z-50 shadow-2xl border border-white/10 animate-in fade-in slide-in-from-top-2 duration-150"
-                    role="region"
-                    aria-label="Billing Reminders List"
-                  >
-                    <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-                      <div className="flex items-center gap-2">
-                        <Bell className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                        <span className="font-bold text-sm text-white">Billing Reminders</span>
-                      </div>
-                      <span className="text-xs text-slate-400 tabular-num">{alerts.length} active</span>
-                    </div>
-
-                    <div className="mt-3 max-h-80 overflow-y-auto space-y-2 no-scrollbar">
-                      {alerts.length === 0 ? (
-                        <p className="text-xs text-slate-400 text-center py-4">
-                          All clear! No pending bill due dates or statements in the next 3 days.
-                        </p>
-                      ) : (
-                        alerts.map(alert => (
-                          <div
-                            key={alert.id}
-                            className={`p-3 rounded-2xl border text-xs backdrop-blur-sm ${
-                              alert.urgency === 'high'
-                                ? 'bg-rose-950/40 border-rose-500/30 text-rose-200'
-                                : alert.urgency === 'medium'
-                                ? 'bg-amber-950/40 border-amber-500/30 text-amber-200'
-                                : 'bg-white/[0.04] border-white/[0.08] text-slate-200'
-                            }`}
-                          >
-                            <div className="font-bold text-white mb-0.5">{alert.title}</div>
-                            <p className="text-slate-300 leading-relaxed">{alert.message}</p>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </>
+            <button
+              onClick={() => setShowNotificationMenu(!showNotificationMenu)}
+              className="w-9 h-9 rounded-full bg-white/[0.05] hover:bg-white/[0.10] active:scale-95 text-slate-300 border border-white/[0.08] backdrop-blur-md relative transition-all flex items-center justify-center min-h-[44px] min-w-[44px]"
+              aria-label={`Billing cycle reminders: ${alerts.length} active`}
+              aria-expanded={showNotificationMenu}
+            >
+              <Bell className="w-4 h-4" aria-hidden="true" />
+              {alerts.length > 0 && (
+                <span className={`absolute top-0 right-0 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center text-slate-950 tabular-num ${
+                  highUrgencyCount > 0 ? 'bg-rose-400 animate-pulse' : 'bg-amber-400'
+                }`}>
+                  {alerts.length}
+                </span>
               )}
-            </div>
+            </button>
 
             {/* Settings Button */}
             <button
@@ -261,6 +224,100 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       </div>
     </header>
+
+    {/* Apple-Style Notification Center Popover (Rendered outside header to avoid backdrop-filter coordinate clipping) */}
+    {showNotificationMenu && (
+      <div 
+        className="fixed inset-0 z-50 flex items-start justify-center sm:justify-end pt-18 sm:pt-20 px-4 sm:px-8"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="billing-reminders-title"
+      >
+        {/* Backdrop for click-outside dismissal */}
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-200" 
+          onClick={() => setShowNotificationMenu(false)}
+          aria-hidden="true"
+        />
+
+        {/* Dialog Card */}
+        <div 
+          className="relative w-full max-w-md sm:max-w-sm glass-panel rounded-3xl p-5 shadow-2xl border border-white/10 z-10 animate-in fade-in slide-in-from-top-3 duration-200"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400">
+                <Bell className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 id="billing-reminders-title" className="font-bold text-sm text-white">Billing Reminders</h2>
+                <span className="text-[11px] text-slate-400 tabular-num">{alerts.length} active alert{alerts.length === 1 ? '' : 's'}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowNotificationMenu(false)}
+              className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-zinc-400 hover:text-white flex items-center justify-center transition-colors min-h-[32px] min-w-[32px]"
+              aria-label="Close billing reminders"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="mt-3.5 max-h-[60vh] sm:max-h-80 overflow-y-auto space-y-2.5 no-scrollbar pr-0.5">
+            {alerts.length === 0 ? (
+              <div className="text-center py-6">
+                <p className="text-xs text-slate-300 font-medium">All clear!</p>
+                <p className="text-[11px] text-slate-500 mt-1">No payment deadlines or statements in the next 3 days.</p>
+              </div>
+            ) : (
+              alerts.map(alert => (
+                <div
+                  key={alert.id}
+                  className={`p-3.5 rounded-2xl border text-xs backdrop-blur-sm transition-colors ${
+                    alert.urgency === 'high'
+                      ? 'bg-rose-950/40 border-rose-500/30 text-rose-200 shadow-sm shadow-rose-950/20'
+                      : alert.urgency === 'medium'
+                      ? 'bg-amber-950/40 border-amber-500/30 text-amber-200 shadow-sm shadow-amber-950/20'
+                      : 'bg-white/[0.04] border-white/[0.08] text-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="font-bold text-white tracking-tight">{alert.title}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${
+                      alert.urgency === 'high'
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                        : alert.urgency === 'medium'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'bg-white/10 text-slate-300'
+                    }`}>
+                      {alert.urgency === 'high' ? 'Urgent' : alert.urgency === 'medium' ? 'Soon' : 'Info'}
+                    </span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed break-words text-[11.5px]">{alert.message}</p>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Bottom action to view calendar */}
+          {alerts.length > 0 && (
+            <div className="pt-3 mt-3 border-t border-white/[0.08] flex items-center justify-end">
+              <button
+                onClick={() => {
+                  setShowNotificationMenu(false);
+                  setActiveTab('calendar');
+                }}
+                className="flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold transition-colors py-1 px-2 rounded-lg hover:bg-amber-400/10 min-h-[36px]"
+              >
+                <CalendarIcon className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>View Full Billing Calendar &rarr;</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
 
     {/* iOS-Style Bottom Tab Bar for Mobile Thumb Ergonomics */}
     <nav 

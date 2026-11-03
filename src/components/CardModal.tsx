@@ -6,7 +6,7 @@ import { X, Sparkles, Info, Check } from 'lucide-react';
 interface CardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (cardData: Partial<CreditCard>) => Promise<void>;
+  onSave: (cardData: Partial<CreditCard> & { autoFetchBenefits?: boolean }) => Promise<void>;
   editingCard?: CreditCard | null;
 }
 
@@ -38,12 +38,45 @@ export const CardModal: React.FC<CardModalProps> = ({
   const [cardColor, setCardColor] = useState(editingCard?.cardColor || COLOR_OPTIONS[0].id);
   const [notes, setNotes] = useState(editingCard?.notes || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [autoFetchBenefits, setAutoFetchBenefits] = useState(!editingCard);
   const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
   const [isCardDropdownOpen, setIsCardDropdownOpen] = useState(false);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
   const bankContainerRef = useRef<HTMLDivElement>(null);
   const cardContainerRef = useRef<HTMLDivElement>(null);
+
+  const [prevCardId, setPrevCardId] = useState<string | undefined>(editingCard?.id);
+
+  // Adjust form fields during render when editingCard changes (official React recommended pattern)
+  if (editingCard?.id !== prevCardId) {
+    setPrevCardId(editingCard?.id);
+    if (editingCard) {
+      setBankName(editingCard.bankName);
+      setCardName(editingCard.cardName);
+      setCardNetwork(editingCard.cardNetwork);
+      setStatementDay(editingCard.statementDay);
+      setDueDaysAfterStatement(editingCard.dueDaysAfterStatement);
+      setSpecificDueDay(editingCard.specificDueDay ? String(editingCard.specificDueDay) : '');
+      setCardAlias(editingCard.cardAlias || '');
+      setCreditLimit(editingCard.creditLimit ? String(editingCard.creditLimit) : '');
+      setCardColor(editingCard.cardColor || COLOR_OPTIONS[0].id);
+      setNotes(editingCard.notes || '');
+      setAutoFetchBenefits(false); // Retain existing perks instantly when editing
+    } else {
+      setBankName('');
+      setCardName('');
+      setCardNetwork('visa');
+      setStatementDay(15);
+      setDueDaysAfterStatement(20);
+      setSpecificDueDay('');
+      setCardAlias('');
+      setCreditLimit('');
+      setCardColor(COLOR_OPTIONS[0].id);
+      setNotes('');
+      setAutoFetchBenefits(true); // Default to fetching perks for new cards
+    }
+  }
 
   // Close custom dropdowns on outside click
   useEffect(() => {
@@ -129,6 +162,7 @@ export const CardModal: React.FC<CardModalProps> = ({
         creditLimit: creditLimit ? Number(creditLimit) : undefined,
         cardColor,
         notes: notes.trim() || undefined,
+        autoFetchBenefits,
       });
       onClose();
     } catch (err) {
@@ -465,6 +499,39 @@ export const CardModal: React.FC<CardModalProps> = ({
             </div>
           </div>
 
+          {/* Auto-Fetch Benefits Option */}
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
+            <div className="flex items-center gap-2.5 pr-2">
+              <div className="p-2 rounded-xl bg-amber-400/10 text-amber-400 shrink-0">
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">Auto-fetch perks &amp; lounge rules</div>
+                <div className="text-[11px] text-zinc-400 leading-tight">
+                  {autoFetchBenefits
+                    ? 'Retrieves airport lounge access, cashback rates & fees'
+                    : 'Instant save using local catalog / preserves current perks'}
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={autoFetchBenefits}
+              onClick={() => setAutoFetchBenefits(!autoFetchBenefits)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                autoFetchBenefits ? 'bg-amber-400' : 'bg-white/10'
+              }`}
+              aria-label="Toggle auto-fetch perks and lounge rules"
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  autoFetchBenefits ? 'translate-x-5 !bg-black' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
           {/* Submit Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
             <button
@@ -480,7 +547,13 @@ export const CardModal: React.FC<CardModalProps> = ({
               className="btn-gold flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50 min-h-[44px]"
             >
               <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>{isSubmitting ? 'Saving & Fetching...' : editingCard ? 'Update & Fetch Benefits' : 'Save & Fetch Latest Benefits'}</span>
+              <span>
+                {isSubmitting
+                  ? (autoFetchBenefits ? 'Saving & Fetching Perks...' : 'Saving Card...')
+                  : autoFetchBenefits
+                  ? (editingCard ? 'Update & Fetch Perks' : 'Save & Fetch Perks')
+                  : (editingCard ? 'Update Card' : 'Save Card')}
+              </span>
             </button>
           </div>
         </form>

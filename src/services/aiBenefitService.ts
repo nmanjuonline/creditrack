@@ -21,23 +21,39 @@ export function saveStoredGeminiKey(key: string): void {
 }
 
 /**
+ * Promise timeout helper to guarantee the UI never freezes or hangs indefinitely
+ */
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutErrorMsg: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(timeoutErrorMsg)), timeoutMs)
+    ),
+  ]);
+}
+
+/**
  * Fetches the latest benefits for a credit card.
  * Priority:
- * 1. If Gemini API key is configured, calls gemini-3.8-flash with web-search awareness to extract latest terms.
- * 2. If no API key or offline, checks local pre-populated card catalog.
+ * 1. If allowAi is true and Gemini API key is configured, calls gemini-3.8-flash with strict 7s timeout.
+ * 2. If allowAi is false, no key, offline, or timeout/error: checks local pre-populated card catalog.
  * 3. Fallback: generates baseline template for user review.
  */
 export async function fetchCardBenefits(
   bankName: string,
   cardName: string,
-  _forceAi: boolean = false
+  allowAi: boolean = true
 ): Promise<{ benefits: CardBenefits; source: 'ai' | 'catalog' | 'default'; message?: string }> {
   const geminiKey = getStoredGeminiKey();
 
-  // If AI is available and requested/supported, call Gemini 3.8 Flash
-  if (geminiKey) {
+  // If AI is enabled and key is available, call Gemini 3.8 Flash with a strict 7s timeout
+  if (allowAi && geminiKey) {
     try {
-      const aiBenefits = await fetchWithGemini(bankName, cardName, geminiKey);
+      const aiBenefits = await withTimeout(
+        fetchWithGemini(bankName, cardName, geminiKey),
+        7000,
+        'Gemini benefits fetch timed out after 7 seconds'
+      );
       if (aiBenefits) {
         return {
           benefits: aiBenefits,
@@ -45,8 +61,8 @@ export async function fetchCardBenefits(
           message: 'Fetched latest live terms and benefits via Gemini AI.',
         };
       }
-    } catch (err: any) {
-      console.warn('Gemini fetch failed, falling back to catalog:', err);
+    } catch (err: unknown) {
+      console.warn('Gemini fetch skipped or timed out, falling back to local catalog:', err);
     }
   }
 
@@ -171,6 +187,11 @@ JSON Structure:
     cleanJson = jsonMatch[1];
   }
 
-  const parsed = JSON.parse(cleanJson);
-  return parsed as CardBenefits;
+  try {
+    const parsed = JSON.parse(cleanJson);
+    return parsed as CardBenefits;
+  } catch (parseErr) {
+    console.warn('Failed to parse Gemini response as JSON:', parseErr);
+    return null;
+  }
 }
