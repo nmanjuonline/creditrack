@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { CreditCard, CardNetwork } from '../types/card';
 import { POPULAR_BANKS, CARD_CATALOG, findInCatalog } from '../data/cardCatalog';
-import { X, Sparkles, Info, Check } from 'lucide-react';
+import { X, Sparkles, Info, Check, ChevronDown, SlidersHorizontal } from 'lucide-react';
 
 interface CardModalProps {
   isOpen: boolean;
@@ -63,6 +63,15 @@ export const CardModal: React.FC<CardModalProps> = ({
   const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
   const [isCardDropdownOpen, setIsCardDropdownOpen] = useState(false);
 
+  const initialHasOptional = Boolean(
+    (editingCard?.creditLimit && editingCard.creditLimit > 0) ||
+    editingCard?.cardAlias ||
+    editingCard?.notes ||
+    editingCard?.specificDueDay ||
+    (editingCard?.cardColor && editingCard.cardColor !== COLOR_OPTIONS[0].id)
+  );
+  const [isAdditionalOpen, setIsAdditionalOpen] = useState(initialHasOptional);
+
   const firstInputRef = useRef<HTMLInputElement>(null);
   const bankContainerRef = useRef<HTMLDivElement>(null);
   const cardContainerRef = useRef<HTMLDivElement>(null);
@@ -70,11 +79,23 @@ export const CardModal: React.FC<CardModalProps> = ({
   const [prevCardId, setPrevCardId] = useState<string | undefined>(editingCard?.id);
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
-  // Reset dropdowns if modal opens or closes
+  // Reset dropdowns and sync disclosure state if modal opens or closes
   if (isOpen !== prevIsOpen) {
     setPrevIsOpen(isOpen);
     setIsBankDropdownOpen(false);
     setIsCardDropdownOpen(false);
+    if (isOpen && editingCard) {
+      const hasOptional = Boolean(
+        (editingCard.creditLimit && editingCard.creditLimit > 0) ||
+        editingCard.cardAlias ||
+        editingCard.notes ||
+        editingCard.specificDueDay ||
+        (editingCard.cardColor && editingCard.cardColor !== COLOR_OPTIONS[0].id)
+      );
+      setIsAdditionalOpen(hasOptional);
+    } else if (!isOpen) {
+      setIsAdditionalOpen(false);
+    }
   }
 
   // Adjust form fields during render when editingCard changes (official React recommended pattern)
@@ -94,6 +115,15 @@ export const CardModal: React.FC<CardModalProps> = ({
       setCardColor(editingCard.cardColor || COLOR_OPTIONS[0].id);
       setNotes(editingCard.notes || '');
       setAutoFetchBenefits(false); // Retain existing perks instantly when editing
+
+      const hasOptional = Boolean(
+        (editingCard.creditLimit && editingCard.creditLimit > 0) ||
+        editingCard.cardAlias ||
+        editingCard.notes ||
+        editingCard.specificDueDay ||
+        (editingCard.cardColor && editingCard.cardColor !== COLOR_OPTIONS[0].id)
+      );
+      setIsAdditionalOpen(hasOptional);
     } else {
       setBankName('');
       setCardName('');
@@ -106,6 +136,7 @@ export const CardModal: React.FC<CardModalProps> = ({
       setCardColor(COLOR_OPTIONS[0].id);
       setNotes('');
       setAutoFetchBenefits(true); // Default to fetching perks for new cards
+      setIsAdditionalOpen(false);
     }
   }
 
@@ -177,6 +208,13 @@ export const CardModal: React.FC<CardModalProps> = ({
   const matchingCards = cardSuggestions.filter(c => 
     !cardName.trim() || c.cardName.toLowerCase().includes(cardName.toLowerCase().trim())
   );
+
+  const activeOptionalCount =
+    (creditLimit.trim() ? 1 : 0) +
+    (cardAlias.trim() ? 1 : 0) +
+    (specificDueDay ? 1 : 0) +
+    (notes.trim() ? 1 : 0) +
+    (cardColor !== COLOR_OPTIONS[0].id ? 1 : 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -457,110 +495,171 @@ export const CardModal: React.FC<CardModalProps> = ({
             </div>
           </div>
 
-          {/* Optional Metadata */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label htmlFor="card-alias-input" className="block text-xs font-semibold text-zinc-200 mb-1">
-                Nickname / Alias (Optional)
-              </label>
-              <input
-                id="card-alias-input"
-                type="text"
-                value={cardAlias}
-                onChange={e => setCardAlias(e.target.value)}
-                placeholder="e.g. Travel Card"
-                className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px]"
-              />
-            </div>
+          {/* Progressive Disclosure: Additional Details & Customization */}
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] overflow-hidden transition-colors hover:border-white/[0.14]">
+            <button
+              id="additional-details-trigger"
+              type="button"
+              onClick={() => setIsAdditionalOpen(!isAdditionalOpen)}
+              aria-expanded={isAdditionalOpen}
+              aria-controls="additional-card-details"
+              className="w-full flex items-center justify-between p-3.5 sm:p-4 text-left hover:bg-white/[0.03] transition-colors min-h-[48px] focus:outline-none focus:ring-1 focus:ring-amber-400/40 rounded-2xl"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-amber-400/10 text-amber-300 border border-amber-400/20 shrink-0">
+                  <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-zinc-100 flex items-center gap-2">
+                    <span>Additional Details &amp; Customization</span>
+                    {activeOptionalCount > 0 && (
+                      <span className="text-[10px] font-bold text-amber-300 bg-amber-400/15 px-2 py-0.5 rounded-full border border-amber-400/30 tabular-num">
+                        {activeOptionalCount} set
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                    Credit limit, nickname, fixed due day, card color &amp; notes
+                  </p>
+                </div>
+              </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label htmlFor="credit-limit-input" className="block text-xs font-semibold text-zinc-200">
-                  Credit Limit (Optional)
-                </label>
-                {creditLimit && getCreditLimitWords(creditLimit) && (
-                  <span className="text-[10px] font-semibold text-amber-300 tabular-num">
+              <div className="flex items-center gap-2 shrink-0">
+                {activeOptionalCount === 0 && (
+                  <span className="text-[10px] text-zinc-500 font-medium hidden sm:inline">
+                    Optional
+                  </span>
+                )}
+                {creditLimit && getCreditLimitWords(creditLimit) && !isAdditionalOpen && (
+                  <span className="text-[10px] font-bold text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20 tabular-num hidden sm:inline">
                     {getCreditLimitWords(creditLimit)}
                   </span>
                 )}
+                <div className="p-1 rounded-lg text-zinc-400 transition-colors">
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      isAdditionalOpen ? 'rotate-180 text-amber-300' : 'text-zinc-400'
+                    }`}
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 select-none pointer-events-none">
-                  ₹
-                </span>
-                <input
-                  id="credit-limit-input"
-                  type="text"
-                  inputMode="numeric"
-                  value={creditLimit}
-                  onChange={(e) => {
-                    const rawDigits = e.target.value.replace(/\D/g, '');
-                    if (!rawDigits) {
-                      setCreditLimit('');
-                    } else {
-                      const num = parseInt(rawDigits, 10);
-                      setCreditLimit(isNaN(num) ? '' : num.toLocaleString('en-IN'));
-                    }
-                  }}
-                  placeholder="e.g. 5,00,000"
-                  className="w-full pl-6.5 pr-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px] tabular-num font-medium"
-                />
+            </button>
+
+            {isAdditionalOpen && (
+              <div
+                id="additional-card-details"
+                role="region"
+                aria-labelledby="additional-details-trigger"
+                className="p-4 pt-2 space-y-4 border-t border-white/[0.06] animate-in fade-in-50 duration-200"
+              >
+                {/* Nickname, Credit Limit, Fixed Due Day */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label htmlFor="card-alias-input" className="block text-xs font-semibold text-zinc-200 mb-1">
+                      Nickname / Alias (Optional)
+                    </label>
+                    <input
+                      id="card-alias-input"
+                      type="text"
+                      value={cardAlias}
+                      onChange={e => setCardAlias(e.target.value)}
+                      placeholder="e.g. Travel Card"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px]"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label htmlFor="credit-limit-input" className="block text-xs font-semibold text-zinc-200">
+                        Credit Limit (Optional)
+                      </label>
+                      {creditLimit && getCreditLimitWords(creditLimit) && (
+                        <span className="text-[10px] font-semibold text-amber-300 tabular-num">
+                          {getCreditLimitWords(creditLimit)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 select-none pointer-events-none">
+                        ₹
+                      </span>
+                      <input
+                        id="credit-limit-input"
+                        type="text"
+                        inputMode="numeric"
+                        value={creditLimit}
+                        onChange={(e) => {
+                          const rawDigits = e.target.value.replace(/\D/g, '');
+                          if (!rawDigits) {
+                            setCreditLimit('');
+                          } else {
+                            const num = parseInt(rawDigits, 10);
+                            setCreditLimit(isNaN(num) ? '' : num.toLocaleString('en-IN'));
+                          }
+                        }}
+                        placeholder="e.g. 5,00,000"
+                        className="w-full pl-6.5 pr-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px] tabular-num font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="specific-due-day-input" className="block text-xs font-semibold text-zinc-200 mb-1">
+                      Fixed Due Day (Optional)
+                    </label>
+                    <input
+                      id="specific-due-day-input"
+                      type="number"
+                      min="1"
+                      max="31"
+                      value={specificDueDay}
+                      onChange={e => setSpecificDueDay(e.target.value)}
+                      placeholder="e.g. 5th of month"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px] tabular-num"
+                    />
+                  </div>
+                </div>
+
+                {/* Card Visual Finish */}
+                <div>
+                  <span className="block text-xs font-semibold text-zinc-200 mb-1.5">
+                    Card Visual Finish
+                  </span>
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" role="radiogroup" aria-label="Card color finish">
+                    {COLOR_OPTIONS.map(c => (
+                      <button
+                        type="button"
+                        key={c.id}
+                        onClick={() => setCardColor(c.id)}
+                        className={`w-8 h-8 rounded-full bg-gradient-to-tr ${c.id} border-2 transition-all shrink-0 min-h-[32px] min-w-[32px] ${
+                          cardColor === c.id ? 'border-amber-400 scale-110 shadow-lg ring-2 ring-amber-400/40' : 'border-transparent opacity-70 hover:opacity-100'
+                        }`}
+                        title={c.label}
+                        aria-label={c.label}
+                        role="radio"
+                        aria-checked={cardColor === c.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label htmlFor="card-notes-input" className="block text-xs font-semibold text-zinc-200 mb-1">
+                    Personal Notes &amp; Reminders (Optional)
+                  </label>
+                  <input
+                    id="card-notes-input"
+                    type="text"
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="e.g. Annual fee waiver target: ₹3L spend; Primary card for airport lounge"
+                    className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px]"
+                  />
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label htmlFor="specific-due-day-input" className="block text-xs font-semibold text-zinc-200 mb-1">
-                Fixed Due Day (Optional)
-              </label>
-              <input
-                id="specific-due-day-input"
-                type="number"
-                min="1"
-                max="31"
-                value={specificDueDay}
-                onChange={e => setSpecificDueDay(e.target.value)}
-                placeholder="e.g. 5th of month"
-                className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px] tabular-num"
-              />
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label htmlFor="card-notes-input" className="block text-xs font-semibold text-zinc-200 mb-1">
-              Personal Notes &amp; Reminders (Optional)
-            </label>
-            <input
-              id="card-notes-input"
-              type="text"
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="e.g. Annual fee waiver target: ₹3L spend; Primary card for airport lounge"
-              className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px]"
-            />
-          </div>
-
-          {/* Card Visual Finish */}
-          <div>
-            <span className="block text-xs font-semibold text-zinc-200 mb-1.5">
-              Card Visual Finish
-            </span>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" role="radiogroup" aria-label="Card color finish">
-              {COLOR_OPTIONS.map(c => (
-                <button
-                  type="button"
-                  key={c.id}
-                  onClick={() => setCardColor(c.id)}
-                  className={`w-8 h-8 rounded-full bg-gradient-to-tr ${c.id} border-2 transition-all shrink-0 min-h-[32px] min-w-[32px] ${
-                    cardColor === c.id ? 'border-amber-400 scale-110 shadow-lg ring-2 ring-amber-400/40' : 'border-transparent opacity-70 hover:opacity-100'
-                  }`}
-                  title={c.label}
-                  aria-label={c.label}
-                  role="radio"
-                  aria-checked={cardColor === c.id}
-                />
-              ))}
-            </div>
+            )}
           </div>
 
           {/* Auto-Fetch Benefits Option */}

@@ -227,3 +227,4 @@ Tactile, physical, and executive feel across all controls.
 - **Don't** render the stack deck switcher or deck view on desktop screens (`>= 768px`).
 - **Don't** auto-focus form inputs when editing an existing card or on mobile touchscreens.
 - **Don't** request or collect 16-digit card numbers, CVVs, expiration dates, or bank login credentials.
+
