@@ -57,3 +57,4 @@ Unlike conventional payment aggregator apps (CRED, CheQ) that demand SMS read pe
 - **WCAG 2.1 AA Contrast:** High-contrast text labels (`slate-400`, `zinc-200`, `amber-300`) on deep obsidian dark backdrops (`#090b10`).
 - **Indian Locale Formatting:** Full native support for Indian currency denomination conventions (`en-IN` separators, Lakhs, Crores, e.g. `₹5,00,000`).
 - **Touch & Keyboard Ergonomics:** Minimum 44x44px interactive tap targets, explicit Escape key and backdrop dismissal, and fluid bottom sheet modal sheets.
+
