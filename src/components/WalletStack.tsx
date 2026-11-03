@@ -285,11 +285,6 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                 {/* Specular sheen */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.08] via-transparent to-black/20 pointer-events-none" />
 
-                {/* Watermark Network */}
-                <div className="absolute right-4 bottom-2 opacity-15 text-5xl sm:text-6xl font-black select-none pointer-events-none uppercase tracking-tighter" aria-hidden="true">
-                  {card.cardNetwork}
-                </div>
-
                 {/* Top row: Bank, Favorite, Network */}
                 <div className="flex items-center justify-between relative z-10">
                   <div>
@@ -361,8 +356,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                       <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
                     </div>
                     {card.creditLimit && card.creditLimit > 0 ? (
-                      <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
-                        {formatCreditLimit(card.creditLimit)} Limit
+                      <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20 whitespace-nowrap shrink-0">
+                        Limit: {formatCreditLimit(card.creditLimit)}
                       </span>
                     ) : (
                       <span>Return: <strong className="text-amber-300">{card.benefits?.rewardRate?.basePercent || 1}%</strong></span>
@@ -606,8 +601,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                   className={`relative aspect-[1.586/1] w-full rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_12px_28px_rgba(0,0,0,0.7)] transition-all duration-300 hover:translate-y-[-8px] cursor-pointer active:scale-[0.99] flex flex-col justify-between ${isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_24px_rgba(245,158,11,0.3)]' : 'ring-1 ring-white/15'
                     }`}
                   style={{
-                    // Consistent ~68px tab exposure on every screen size
-                    marginTop: idx === 0 ? '0px' : '-135px',
+                    // Exactly 76px exposed tab on every screen size (card height is 63.05% of width)
+                    marginTop: idx === 0 ? '0px' : 'calc(-63.05% + 76px)',
                     // Strictly ascending z-index so each card stacks cleanly on top of the previous one
                     zIndex: idx + 1,
                   }}
@@ -622,9 +617,6 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.08] via-transparent to-black/25 pointer-events-none" />
-                  <div className="absolute right-4 bottom-2 opacity-15 text-5xl sm:text-6xl font-black select-none pointer-events-none uppercase tracking-tighter" aria-hidden="true">
-                    {card.cardNetwork}
-                  </div>
 
                   {/* Top row: Bank Name, Active Pill & Network Badge & Float */}
                   <div className="flex items-center justify-between relative z-10">
@@ -697,8 +689,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                           <span>Cut: <strong className="text-white">{card.statementDay}th</strong></span>
                           <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
                           {card.creditLimit && card.creditLimit > 0 ? (
-                            <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
-                              {formatCreditLimit(card.creditLimit)} Limit
+                            <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20 whitespace-nowrap shrink-0">
+                              Limit: {formatCreditLimit(card.creditLimit)}
                             </span>
                           ) : (
                             <span>Return: <strong className="text-amber-300">{card.benefits?.rewardRate?.basePercent || 1}%</strong></span>

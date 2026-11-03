@@ -75,9 +75,6 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
         <div className={`relative aspect-[1.586/1] p-4 sm:p-5 rounded-2xl bg-gradient-to-tr ${getCardBg()} text-white overflow-hidden shadow-xl ring-1 ring-white/15 flex flex-col justify-between transition-transform duration-300 group-hover:scale-[1.01]`}>
           {/* Specular hairline shimmer & card texture */}
           <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.06] via-transparent to-black/20 pointer-events-none" />
-          <div className="absolute right-3 bottom-2 opacity-15 text-4xl sm:text-5xl font-black select-none pointer-events-none uppercase tracking-tighter" aria-hidden="true">
-            {card.cardNetwork}
-          </div>
 
           {/* Top row: Bank & Favorite & Network */}
           <div className="flex items-center justify-between relative z-10">
@@ -150,8 +147,8 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
                 <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
               </div>
               {card.creditLimit && card.creditLimit > 0 ? (
-                <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
-                  {formatCreditLimit(card.creditLimit)} Limit
+                <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20 whitespace-nowrap shrink-0">
+                  Limit: {formatCreditLimit(card.creditLimit)}
                 </span>
               ) : (
                 <span>Return: <strong className="text-amber-300">{card.benefits?.rewardRate?.basePercent || 1}%</strong></span>

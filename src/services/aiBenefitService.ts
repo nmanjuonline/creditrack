@@ -46,13 +46,13 @@ export async function fetchCardBenefits(
 ): Promise<{ benefits: CardBenefits; source: 'ai' | 'catalog' | 'default'; message?: string }> {
   const geminiKey = getStoredGeminiKey();
 
-  // If AI is enabled and key is available, call Gemini 3.8 Flash with a strict 7s timeout
+  // If AI is enabled and key is available, call Gemini Flash with a 30s timeout
   if (allowAi && geminiKey) {
     try {
       const aiBenefits = await withTimeout(
         fetchWithGemini(bankName, cardName, geminiKey),
-        7000,
-        'Gemini benefits fetch timed out after 7 seconds'
+        30000,
+        'Gemini benefits fetch timed out after 30 seconds'
       );
       if (aiBenefits) {
         return {
@@ -172,12 +172,29 @@ JSON Structure:
 }
 `;
 
-  const response = await client.interactions.create({
-    model: 'gemini-3.8-flash',
-    input: `${systemInstruction}\n\n${prompt}`,
-  });
+  const fullPrompt = `${systemInstruction}\n\n${prompt}\nNote: Keep descriptions concise and punchy to speed up response generation.`;
 
-  const text = response.output_text?.trim() || '';
+  let text = '';
+  try {
+    const response = await client.interactions.create({
+      model: 'gemini-3.8-flash',
+      input: fullPrompt,
+    });
+    text = response.output_text?.trim() || '';
+  } catch (interactionErr) {
+    console.warn('Gemini interactions.create failed, falling back to models.generateContent:', interactionErr);
+    try {
+      const genResponse = await client.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: fullPrompt,
+      });
+      text = genResponse.text?.trim() || '';
+    } catch (modelErr) {
+      console.error('Gemini models.generateContent fallback also failed:', modelErr);
+      return null;
+    }
+  }
+
   if (!text) return null;
 
   // Extract JSON if wrapped in markdown

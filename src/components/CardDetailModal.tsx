@@ -103,7 +103,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
               className="btn-gold flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50 min-h-[44px]"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
-              <span>{isRefreshing ? 'Updating...' : 'Refresh Benefits'}</span>
+              <span>{isRefreshing ? 'Fetching live perks via AI...' : 'Refresh Benefits'}</span>
             </button>
           </div>
         </div>
