@@ -63,6 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const highUrgencyCount = alerts.filter(a => a.urgency === 'high').length;
 
   return (
+    <>
     <header className="sticky top-0 z-40 bg-[#08090d]/75 backdrop-blur-2xl border-b border-white/[0.07] shadow-[0_4px_30px_rgba(0,0,0,0.5)]" role="banner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -98,42 +99,42 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Navigation Tabs with Frosted Glass & Champagne Accents */}
-          <nav className="hidden md:flex items-center bg-white/[0.03] backdrop-blur-2xl p-1 rounded-2xl border border-white/[0.08]" aria-label="Main Navigation">
+          {/* iOS Segmented Control Navigation */}
+          <nav className="hidden md:flex items-center bg-black/40 backdrop-blur-2xl p-1 rounded-full border border-white/[0.08]" aria-label="Main Navigation">
             <button
               onClick={() => setActiveTab('cards')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
                 activeTab === 'cards'
-                  ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 text-amber-200 border border-amber-500/30 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                  ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/20 text-amber-200 shadow-sm border border-amber-400/30'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               aria-current={activeTab === 'cards' ? 'page' : undefined}
             >
-              <LayoutGrid className="w-4 h-4" aria-hidden="true" />
+              <LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Cards & Perks</span>
             </button>
             <button
               onClick={() => setActiveTab('float')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
                 activeTab === 'float'
-                  ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 text-amber-200 border border-amber-500/30 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                  ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/20 text-amber-200 shadow-sm border border-amber-400/30'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               aria-current={activeTab === 'float' ? 'page' : undefined}
             >
-              <Sparkles className="w-4 h-4 text-amber-400" aria-hidden="true" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
               <span>Best Card Today</span>
             </button>
             <button
               onClick={() => setActiveTab('calendar')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
                 activeTab === 'calendar'
-                  ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 text-amber-200 border border-amber-500/30 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
+                  ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/20 text-amber-200 shadow-sm border border-amber-400/30'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               aria-current={activeTab === 'calendar' ? 'page' : undefined}
             >
-              <CalendarIcon className="w-4 h-4" aria-hidden="true" />
+              <CalendarIcon className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Billing Calendar</span>
             </button>
           </nav>
@@ -257,40 +258,55 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Navigation bar */}
-        <nav className="flex md:hidden items-center justify-around py-2 border-t border-white/[0.08] text-xs" aria-label="Mobile Navigation">
-          <button
-            onClick={() => setActiveTab('cards')}
-            className={`flex items-center gap-1.5 py-2 px-4 rounded-xl font-medium min-h-[44px] transition-all ${
-              activeTab === 'cards' ? 'bg-amber-400/20 text-amber-200 border border-amber-400/30' : 'text-zinc-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'cards' ? 'page' : undefined}
-          >
-            <LayoutGrid className="w-4 h-4" aria-hidden="true" />
-            <span>Cards</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('float')}
-            className={`flex items-center gap-1.5 py-2 px-4 rounded-xl font-medium min-h-[44px] transition-all ${
-              activeTab === 'float' ? 'bg-amber-400/20 text-amber-200 border border-amber-400/30' : 'text-zinc-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'float' ? 'page' : undefined}
-          >
-            <Sparkles className="w-4 h-4 text-amber-400" aria-hidden="true" />
-            <span>Best Card</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`flex items-center gap-1.5 py-2 px-4 rounded-xl font-medium min-h-[44px] transition-all ${
-              activeTab === 'calendar' ? 'bg-amber-400/20 text-amber-200 border border-amber-400/30' : 'text-zinc-400 hover:text-white'
-            }`}
-            aria-current={activeTab === 'calendar' ? 'page' : undefined}
-          >
-            <CalendarIcon className="w-4 h-4" aria-hidden="true" />
-            <span>Calendar</span>
-          </button>
-        </nav>
       </div>
     </header>
+
+    {/* iOS-Style Bottom Tab Bar for Mobile Thumb Ergonomics */}
+    <nav 
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#08090d]/90 backdrop-blur-2xl border-t border-white/[0.08] pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.6)]" 
+      aria-label="Mobile Bottom Navigation"
+    >
+      <div className="flex items-center justify-around px-3 pt-2 pb-1">
+        <button
+          onClick={() => setActiveTab('cards')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all active:scale-95 min-h-[48px] ${
+            activeTab === 'cards' ? 'text-amber-300 font-semibold' : 'text-zinc-400 hover:text-zinc-200 font-medium'
+          }`}
+          aria-current={activeTab === 'cards' ? 'page' : undefined}
+        >
+          <div className={`p-1 rounded-lg ${activeTab === 'cards' ? 'bg-amber-400/15' : ''}`}>
+            <LayoutGrid className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <span className="text-[11px] tracking-tight mt-0.5">Cards</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('float')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all active:scale-95 min-h-[48px] ${
+            activeTab === 'float' ? 'text-amber-300 font-semibold' : 'text-zinc-400 hover:text-zinc-200 font-medium'
+          }`}
+          aria-current={activeTab === 'float' ? 'page' : undefined}
+        >
+          <div className={`p-1 rounded-lg ${activeTab === 'float' ? 'bg-amber-400/15' : ''}`}>
+            <Sparkles className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <span className="text-[11px] tracking-tight mt-0.5">Best Card</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('calendar')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-2 rounded-xl transition-all active:scale-95 min-h-[48px] ${
+            activeTab === 'calendar' ? 'text-amber-300 font-semibold' : 'text-zinc-400 hover:text-zinc-200 font-medium'
+          }`}
+          aria-current={activeTab === 'calendar' ? 'page' : undefined}
+        >
+          <div className={`p-1 rounded-lg ${activeTab === 'calendar' ? 'bg-amber-400/15' : ''}`}>
+            <CalendarIcon className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <span className="text-[11px] tracking-tight mt-0.5">Calendar</span>
+        </button>
+      </div>
+    </nav>
+  </>
   );
 };

@@ -168,7 +168,7 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
         </div>
 
         {/* Days of Week Header with responsive mobile abbreviations */}
-        <div className="grid grid-cols-7 gap-1 text-center font-bold text-[11px] sm:text-xs text-zinc-500 uppercase tracking-widest mb-2" aria-hidden="true">
+        <div className="grid grid-cols-7 gap-1 text-center font-bold text-[11px] sm:text-xs text-slate-400 uppercase tracking-widest mb-2" aria-hidden="true">
           <div><span className="sm:hidden">S</span><span className="hidden sm:inline">Sun</span></div>
           <div><span className="sm:hidden">M</span><span className="hidden sm:inline">Mon</span></div>
           <div><span className="sm:hidden">T</span><span className="hidden sm:inline">Tue</span></div>
@@ -307,7 +307,7 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
                   }`}>
                     {ev.daysAway === 0 ? 'Today!' : `in ${ev.daysAway} day${ev.daysAway > 1 ? 's' : ''}`}
                   </div>
-                  <div className="text-[11px] text-zinc-500 tabular-num">{formatDate(ev.date)}</div>
+                  <div className="text-[11px] text-slate-400 tabular-num">{formatDate(ev.date)}</div>
                 </div>
 
                 <button

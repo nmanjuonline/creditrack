@@ -111,15 +111,15 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
       </div>
 
       {/* Quick Benefit Filter Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full no-scrollbar">
         {FILTER_PILLS.map(pill => (
           <button
             key={pill.id}
             onClick={() => setActiveFilter(pill.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 ${
               activeFilter === pill.id
                 ? 'bg-amber-400/20 text-amber-200 border border-amber-400/40 shadow-sm'
-                : 'glass-pill text-zinc-400 hover:text-zinc-200'
+                : 'bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]'
             }`}
           >
             {pill.icon}

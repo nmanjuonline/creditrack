@@ -30,6 +30,7 @@ export const App: React.FC = () => {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<CreditCard | null>(null);
   const [selectedCardForDetail, setSelectedCardForDetail] = useState<CreditCard | null>(null);
+  const [cardToDelete, setCardToDelete] = useState<CreditCard | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [refreshingCardId, setRefreshingCardId] = useState<string | null>(null);
   const [isTursoConnected, setIsTursoConnected] = useState(false);
@@ -192,15 +193,20 @@ export const App: React.FC = () => {
     }
   };
 
-  // Delete Card
-  const handleDeleteCard = async (id: string) => {
+  // Delete Card (Apple Action Sheet flow)
+  const handleDeleteCard = (id: string) => {
     const card = cards.find(c => c.id === id);
-    if (!window.confirm(`Are you sure you want to remove ${card?.bankName} ${card?.cardName}?`)) {
-      return;
+    if (card) {
+      setCardToDelete(card);
     }
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!cardToDelete) return;
+    const id = cardToDelete.id;
     const newCards = cards.filter(c => c.id !== id);
     setCards(newCards);
+    setCardToDelete(null);
 
     const storage = getStorage();
     try {
@@ -313,7 +319,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Landmark for Accessibility */}
-      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 focus:outline-none" tabIndex={-1}>
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28 md:pb-8 focus:outline-none" tabIndex={-1}>
         {/* VIEW 1: CARDS & BENEFIT SEARCH */}
         {activeTab === 'cards' && (
           <div>
@@ -437,6 +443,52 @@ export const App: React.FC = () => {
         onSyncWithTurso={handleSyncWithTurso}
         isTursoConnected={isTursoConnected}
       />
+
+      {/* Apple-Style Action Sheet for Destructive Card Deletion */}
+      {cardToDelete && (
+        <div 
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-md transition-opacity"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="delete-action-title"
+          aria-describedby="delete-action-desc"
+          onClick={() => setCardToDelete(null)}
+        >
+          <div 
+            className="w-full sm:max-w-md glass-panel sm:rounded-3xl rounded-t-3xl p-6 border border-white/10 shadow-2xl space-y-4 pb-safe animate-in slide-in-from-bottom-5"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* iOS Grabber pill on mobile */}
+            <div className="w-10 h-1 bg-white/20 rounded-full mx-auto sm:hidden mb-2" aria-hidden="true" />
+
+            <div className="text-center sm:text-left space-y-1">
+              <h3 id="delete-action-title" className="text-lg font-bold text-white tracking-tight">
+                Remove Card from CrediTrack?
+              </h3>
+              <p id="delete-action-desc" className="text-xs text-slate-300 leading-relaxed">
+                Are you sure you want to remove <strong className="text-white">{cardToDelete.bankName} {cardToDelete.cardName}</strong>? All billing tracking and saved benefits for this card will be permanently deleted.
+              </p>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setCardToDelete(null)}
+                className="flex-1 py-3 px-4 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-zinc-200 text-xs font-semibold transition-all min-h-[44px]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="flex-1 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white text-xs font-bold shadow-lg shadow-rose-900/40 transition-all min-h-[44px]"
+              >
+                Delete Card
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

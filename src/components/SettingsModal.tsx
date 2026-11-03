@@ -43,6 +43,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [importStatus, setImportStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [notificationStatus, setNotificationStatus] = useState<string>(() => 
     typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default'
   );
@@ -123,12 +124,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           const parsed = JSON.parse(event.target?.result as string);
           if (Array.isArray(parsed)) {
             onImportCards(parsed);
-            alert(`Successfully imported ${parsed.length} cards!`);
+            setImportStatus({ success: true, message: `Successfully imported ${parsed.length} cards!` });
           } else {
-            alert('Invalid backup file format.');
+            setImportStatus({ success: false, message: 'Invalid backup file format.' });
           }
         } catch {
-          alert('Failed to parse JSON file.');
+          setImportStatus({ success: false, message: 'Failed to parse JSON file.' });
         }
       };
     }
@@ -146,12 +147,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-xl overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="settings-modal-title"
+      onClick={onClose}
     >
-      <div className="relative w-full max-w-xl glass-panel rounded-3xl p-6 sm:p-8 my-8 text-white max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div 
+        className="relative w-full sm:max-w-xl glass-panel rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 my-0 sm:my-8 text-white max-h-[90vh] overflow-y-auto shadow-2xl pb-safe"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* iOS Drag Handle on mobile */}
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto sm:hidden mb-4" aria-hidden="true" />
+
         <button
           onClick={onClose}
           className="absolute right-4 top-4 p-2.5 rounded-2xl text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -339,6 +347,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span>Load Sample Cards</span>
               </button>
             </div>
+
+            {importStatus && (
+              <div className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
+                importStatus.success ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-500/30' : 'bg-rose-950/40 text-rose-300 border border-rose-500/30'
+              }`}>
+                {importStatus.success ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
+                <span>{importStatus.message}</span>
+              </div>
+            )}
           </div>
         </div>
 

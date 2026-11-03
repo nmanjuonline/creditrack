@@ -50,12 +50,19 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-xl overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="card-detail-title"
+      onClick={onClose}
     >
-      <div className="relative w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 my-8 text-white max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div 
+        className="relative w-full sm:max-w-2xl glass-panel rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 my-0 sm:my-8 text-white max-h-[90vh] overflow-y-auto shadow-2xl pb-safe"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* iOS Drag Handle on mobile */}
+        <div className="w-10 h-1 bg-white/20 rounded-full mx-auto sm:hidden mb-4" aria-hidden="true" />
+
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -261,7 +268,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                   <span className="font-bold text-sm text-white">Domestic Airport Lounge</span>
                 </div>
                 <span className={`px-2.5 py-0.5 rounded text-xs font-bold ${
-                  card.benefits.domesticLounge.available ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30' : 'bg-white/[0.06] text-zinc-500'
+                  card.benefits.domesticLounge.available ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30' : 'bg-white/[0.06] text-slate-400'
                 }`}>
                   {card.benefits.domesticLounge.available ? 'Complimentary' : 'None'}
                 </span>
@@ -296,7 +303,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                   <span className="font-bold text-sm text-white">International Airport Lounge</span>
                 </div>
                 <span className={`px-2.5 py-0.5 rounded text-xs font-bold ${
-                  card.benefits.internationalLounge.available ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30' : 'bg-white/[0.06] text-zinc-500'
+                  card.benefits.internationalLounge.available ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30' : 'bg-white/[0.06] text-slate-400'
                 }`}>
                   {card.benefits.internationalLounge.available ? 'Complimentary' : 'None'}
                 </span>
@@ -417,7 +424,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
         )}
 
         {/* Modal Footer */}
-        <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-zinc-500">
+        <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-slate-400">
           <span>
             {card.lastBenefitsFetch ? `Benefits updated: ${new Date(card.lastBenefitsFetch).toLocaleDateString()}` : 'Default catalog benefits'}
           </span>

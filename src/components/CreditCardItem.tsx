@@ -53,59 +53,64 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
       className="flex flex-col glass-card rounded-3xl overflow-hidden hover:border-amber-400/30 transition-all duration-300 shadow-xl group"
       aria-label={`${card.bankName} ${card.cardName} card details`}
     >
-      {/* Visual Credit Card Mockup Header */}
-      <div className={`relative p-5 bg-gradient-to-tr ${getCardBg()} text-white border-b border-white/[0.08] overflow-hidden`}>
-        {/* Specular hairline shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.04] to-transparent pointer-events-none" />
-        <div className="absolute right-4 bottom-3 opacity-15 text-5xl font-black select-none pointer-events-none uppercase tracking-tighter" aria-hidden="true">
-          {card.cardNetwork}
-        </div>
-
-        {/* Top bar */}
-        <div className="flex items-center justify-between mb-4 relative z-10">
-          <div>
-            <span className="text-[11px] uppercase font-bold tracking-widest text-zinc-300 drop-shadow">
-              {card.bankName}
-            </span>
-            {card.cardAlias && (
-              <span className="block text-[11px] text-amber-300 font-medium">
-                {card.cardAlias}
-              </span>
-            )}
+      {/* Apple Wallet Physical Card Artifact (ISO/IEC 7810 ID-1 standard ~1.586:1 aspect ratio) */}
+      <div className="p-3 pb-0">
+        <div className={`relative aspect-[1.586/1] p-4 sm:p-5 rounded-2xl bg-gradient-to-tr ${getCardBg()} text-white overflow-hidden shadow-xl ring-1 ring-white/15 flex flex-col justify-between transition-transform duration-300 group-hover:scale-[1.01]`}>
+          {/* Specular hairline shimmer & card texture */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.06] via-transparent to-black/20 pointer-events-none" />
+          <div className="absolute right-3 bottom-2 opacity-15 text-4xl sm:text-5xl font-black select-none pointer-events-none uppercase tracking-tighter" aria-hidden="true">
+            {card.cardNetwork}
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onToggleFavorite(card)}
-              className="text-zinc-400 hover:text-amber-400 transition-colors p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center"
-              aria-label={card.isFavorite ? 'Unfavorite card' : 'Favorite card'}
-              title="Favorite card"
-            >
-              <Star className={`w-4 h-4 ${card.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} aria-hidden="true" />
-            </button>
-            <div className="px-2.5 py-0.5 rounded-full bg-white/[0.08] backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-zinc-200 border border-white/10">
-              {card.cardNetwork}
+          {/* Top row: Bank & Favorite & Network */}
+          <div className="flex items-center justify-between relative z-10">
+            <div>
+              <span className="text-[11px] uppercase font-bold tracking-widest text-zinc-300 drop-shadow-sm">
+                {card.bankName}
+              </span>
+              {card.cardAlias && (
+                <span className="block text-[10px] text-amber-300 font-medium">
+                  {card.cardAlias}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(card);
+                }}
+                className="text-zinc-400 hover:text-amber-400 transition-colors p-2 rounded-full hover:bg-black/20 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                aria-label={card.isFavorite ? 'Unfavorite card' : 'Favorite card'}
+                title="Favorite card"
+              >
+                <Star className={`w-4 h-4 ${card.isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} aria-hidden="true" />
+              </button>
+              <div className="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md text-[9px] font-bold uppercase tracking-wider text-zinc-200 border border-white/15">
+                {card.cardNetwork}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Chip & Contactless Icons in Warm Brushed Gold */}
-        <div className="flex items-center gap-3 my-3 relative z-10" aria-hidden="true">
-          <div className="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-200 via-amber-400 to-yellow-600 border border-amber-200/60 shadow-md flex flex-col justify-between p-1">
-            <div className="w-full h-0.5 bg-yellow-900/30" />
-            <div className="w-full h-0.5 bg-yellow-900/30" />
+          {/* Middle row: EMV Chip & Contactless */}
+          <div className="flex items-center gap-2.5 relative z-10" aria-hidden="true">
+            <div className="w-9 h-6.5 rounded-md bg-gradient-to-tr from-amber-200 via-amber-400 to-yellow-600 border border-amber-200/60 shadow-sm flex flex-col justify-between p-1">
+              <div className="w-full h-0.5 bg-yellow-900/30" />
+              <div className="w-full h-0.5 bg-yellow-900/30" />
+            </div>
+            <Wifi className="w-3.5 h-3.5 text-zinc-400 rotate-90" />
           </div>
-          <Wifi className="w-4 h-4 text-zinc-400 rotate-90" />
-        </div>
 
-        {/* Card Name */}
-        <div className="relative z-10 pt-2">
-          <h3 className="font-bold text-lg text-white tracking-wide">
-            {card.cardName}
-          </h3>
-          <div className="flex items-center justify-between text-[11px] text-zinc-400 mt-1 tabular-num font-medium">
-            <span>Statement Day: <strong className="text-zinc-200">{card.statementDay}th</strong></span>
-            <span>Grace: <strong className="text-zinc-200">+{card.dueDaysAfterStatement} days</strong></span>
+          {/* Bottom row: Card Name & Statement Cycle */}
+          <div className="relative z-10">
+            <h3 className="font-bold text-base sm:text-lg text-white tracking-wide truncate drop-shadow-sm">
+              {card.cardName}
+            </h3>
+            <div className="flex items-center justify-between text-[10px] text-zinc-300/90 mt-0.5 tabular-num font-medium">
+              <span>Cut: <strong className="text-white">{card.statementDay}th</strong></span>
+              <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
+            </div>
           </div>
         </div>
       </div>
@@ -122,7 +127,7 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
             }`}>
               {calc.daysUntilStatement === 0 ? 'Today!' : `in ${calc.daysUntilStatement}d`}
             </span>
-            <span className="text-[10px] text-zinc-500 tabular-num">
+            <span className="text-[10px] text-slate-400 tabular-num">
               ({calc.nextStatementDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})
             </span>
           </div>
@@ -138,7 +143,7 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
             }`}>
               {calc.daysUntilDue === 0 ? 'Today!' : `in ${calc.daysUntilDue}d`}
             </span>
-            <span className="text-[10px] text-zinc-500 tabular-num">
+            <span className="text-[10px] text-slate-400 tabular-num">
               ({calc.nextDueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})
             </span>
           </div>
@@ -180,7 +185,7 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
                   {card.benefits.internationalLounge.available && ` + ${card.benefits.internationalLounge.countPerYear} Int`}
                 </span>
               ) : (
-                <span className="text-zinc-500">No lounge access</span>
+                <span className="text-slate-400">No lounge access</span>
               )}
             </div>
           </div>

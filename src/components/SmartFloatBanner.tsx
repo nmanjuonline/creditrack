@@ -70,10 +70,10 @@ export const SmartFloatBanner: React.FC<SmartFloatBannerProps> = ({ cards, onSel
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all min-h-[44px] ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 min-h-[40px] ${
                 selectedCategory === cat.id
                   ? 'bg-amber-400/20 text-amber-200 border border-amber-400/40 shadow-sm'
-                  : 'glass-pill text-zinc-400 hover:text-zinc-200'
+                  : 'bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]'
               }`}
               role="radio"
               aria-checked={selectedCategory === cat.id}
