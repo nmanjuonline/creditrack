@@ -21,6 +21,27 @@ const COLOR_OPTIONS = [
   { id: 'from-slate-500 via-gray-600 to-zinc-900', label: 'Platinum Silver' },
 ];
 
+function getCreditLimitWords(amountStr: string): string | null {
+  const clean = amountStr.replace(/,/g, '').trim();
+  if (!clean) return null;
+  const num = parseInt(clean, 10);
+  if (isNaN(num) || num <= 0) return null;
+
+  if (num >= 10000000) {
+    const cr = num / 10000000;
+    return `₹${cr % 1 === 0 ? cr : cr.toFixed(2)} Crore`;
+  }
+  if (num >= 100000) {
+    const lakh = num / 100000;
+    return `₹${lakh % 1 === 0 ? lakh : lakh.toFixed(2)} Lakh`;
+  }
+  if (num >= 1000) {
+    const thousand = num / 1000;
+    return `₹${thousand % 1 === 0 ? thousand : thousand.toFixed(1)}k`;
+  }
+  return `₹${num.toLocaleString('en-IN')}`;
+}
+
 export const CardModal: React.FC<CardModalProps> = ({
   isOpen,
   onClose,
@@ -34,7 +55,7 @@ export const CardModal: React.FC<CardModalProps> = ({
   const [dueDaysAfterStatement, setDueDaysAfterStatement] = useState<number>(editingCard?.dueDaysAfterStatement || 20);
   const [specificDueDay, setSpecificDueDay] = useState<string>(editingCard?.specificDueDay ? String(editingCard.specificDueDay) : '');
   const [cardAlias, setCardAlias] = useState(editingCard?.cardAlias || '');
-  const [creditLimit, setCreditLimit] = useState<string>(editingCard?.creditLimit ? String(editingCard.creditLimit) : '');
+  const [creditLimit, setCreditLimit] = useState<string>(editingCard?.creditLimit ? editingCard.creditLimit.toLocaleString('en-IN') : '');
   const [cardColor, setCardColor] = useState(editingCard?.cardColor || COLOR_OPTIONS[0].id);
   const [notes, setNotes] = useState(editingCard?.notes || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +80,7 @@ export const CardModal: React.FC<CardModalProps> = ({
       setDueDaysAfterStatement(editingCard.dueDaysAfterStatement);
       setSpecificDueDay(editingCard.specificDueDay ? String(editingCard.specificDueDay) : '');
       setCardAlias(editingCard.cardAlias || '');
-      setCreditLimit(editingCard.creditLimit ? String(editingCard.creditLimit) : '');
+      setCreditLimit(editingCard.creditLimit ? editingCard.creditLimit.toLocaleString('en-IN') : '');
       setCardColor(editingCard.cardColor || COLOR_OPTIONS[0].id);
       setNotes(editingCard.notes || '');
       setAutoFetchBenefits(false); // Retain existing perks instantly when editing
@@ -159,7 +180,7 @@ export const CardModal: React.FC<CardModalProps> = ({
         dueDaysAfterStatement: Number(dueDaysAfterStatement),
         specificDueDay: specificDueDay ? Number(specificDueDay) : undefined,
         cardAlias: cardAlias.trim() || undefined,
-        creditLimit: creditLimit ? Number(creditLimit) : undefined,
+        creditLimit: creditLimit ? Number(creditLimit.replace(/,/g, '').trim()) : undefined,
         cardColor,
         notes: notes.trim() || undefined,
         autoFetchBenefits,
@@ -431,17 +452,38 @@ export const CardModal: React.FC<CardModalProps> = ({
             </div>
 
             <div>
-              <label htmlFor="credit-limit-input" className="block text-xs font-semibold text-zinc-200 mb-1">
-                Credit Limit ₹ (Optional)
-              </label>
-              <input
-                id="credit-limit-input"
-                type="number"
-                value={creditLimit}
-                onChange={e => setCreditLimit(e.target.value)}
-                placeholder="e.g. 500000"
-                className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px] tabular-num"
-              />
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="credit-limit-input" className="block text-xs font-semibold text-zinc-200">
+                  Credit Limit (Optional)
+                </label>
+                {creditLimit && getCreditLimitWords(creditLimit) && (
+                  <span className="text-[10px] font-semibold text-amber-300 tabular-num">
+                    {getCreditLimitWords(creditLimit)}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400 select-none pointer-events-none">
+                  ₹
+                </span>
+                <input
+                  id="credit-limit-input"
+                  type="text"
+                  inputMode="numeric"
+                  value={creditLimit}
+                  onChange={(e) => {
+                    const rawDigits = e.target.value.replace(/\D/g, '');
+                    if (!rawDigits) {
+                      setCreditLimit('');
+                    } else {
+                      const num = parseInt(rawDigits, 10);
+                      setCreditLimit(isNaN(num) ? '' : num.toLocaleString('en-IN'));
+                    }
+                  }}
+                  placeholder="e.g. 5,00,000"
+                  className="w-full pl-6.5 pr-3.5 py-2.5 rounded-xl glass-input text-xs text-white placeholder-zinc-500 focus:outline-none min-h-[44px] tabular-num font-medium"
+                />
+              </div>
             </div>
 
             <div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { CreditCard } from '../types/card';
-import { calculateBillingCycle } from '../utils/billingUtils';
+import { calculateBillingCycle, getCardTopPerks, formatCreditLimit, getMaskedCardNumber } from '../utils/billingUtils';
 import {
   ChevronUp,
   ChevronLeft,
@@ -21,7 +21,9 @@ import {
   Globe,
   Plus,
   X,
-  Layers
+  Layers,
+  Zap,
+  Gift
 } from 'lucide-react';
 
 interface WalletStackProps {
@@ -34,6 +36,21 @@ interface WalletStackProps {
   refreshingCardId: string | null;
   onAddCard: () => void;
 }
+
+const renderPerkIcon = (category: string) => {
+  switch (category) {
+    case 'lounge':
+      return <Plane className="w-3 h-3 text-amber-300 shrink-0" aria-hidden="true" />;
+    case 'upi':
+      return <Zap className="w-3 h-3 text-amber-300 shrink-0" aria-hidden="true" />;
+    case 'cashback':
+      return <Gift className="w-3 h-3 text-amber-300 shrink-0" aria-hidden="true" />;
+    case 'forex':
+      return <Globe className="w-3 h-3 text-amber-300 shrink-0" aria-hidden="true" />;
+    default:
+      return <Star className="w-3 h-3 text-amber-300 shrink-0" aria-hidden="true" />;
+  }
+};
 
 export const WalletStack: React.FC<WalletStackProps> = ({
   cards,
@@ -304,23 +321,52 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                   </div>
                 </div>
 
-                {/* Middle row: EMV Chip & Contactless */}
-                <div className="flex items-center gap-2.5 relative z-10" aria-hidden="true">
-                  <div className="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-200 via-amber-400 to-yellow-600 border border-amber-200/60 shadow-sm flex flex-col justify-between p-1">
-                    <div className="w-full h-0.5 bg-yellow-900/30" />
-                    <div className="w-full h-0.5 bg-yellow-900/30" />
+                {/* Middle row: EMV Chip & Top Perks Badges */}
+                <div className="flex items-center justify-between gap-2 relative z-10 my-auto py-1">
+                  <div className="flex items-center gap-2" aria-hidden="true">
+                    <div className="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-200 via-amber-400 to-yellow-600 border border-amber-200/60 shadow-sm flex flex-col justify-between p-1">
+                      <div className="w-full h-0.5 bg-yellow-900/30" />
+                      <div className="w-full h-0.5 bg-yellow-900/30" />
+                    </div>
+                    <Wifi className="w-4 h-4 text-zinc-400 rotate-90" />
                   </div>
-                  <Wifi className="w-4 h-4 text-zinc-400 rotate-90" />
+
+                  {/* Top Perks Badges right on card face */}
+                  <div className="flex flex-wrap items-center justify-end gap-1.5 max-w-[65%]">
+                    {getCardTopPerks(card, 2).map((perk, pIdx) => (
+                      <span
+                        key={pIdx}
+                        className="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md text-[10px] font-semibold text-white/90 border border-white/15 flex items-center gap-1 shadow-sm shrink-0"
+                      >
+                        {renderPerkIcon(perk.category)}
+                        <span className="truncate max-w-[110px]">{perk.label}</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Bottom row: Card Name & Statement Cycle */}
+                {/* Bottom row: Card Name, Statement Cycle, & Credit Limit */}
                 <div className="relative z-10">
-                  <h3 className="font-extrabold text-lg sm:text-xl text-white tracking-wide truncate drop-shadow-sm">
-                    {card.cardName}
-                  </h3>
-                  <div className="flex items-center justify-between text-xs text-zinc-300/90 mt-1 tabular-num font-medium">
-                    <span>Cut: <strong className="text-white">{card.statementDay}th</strong></span>
-                    <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
+                  <div className="flex items-baseline justify-between gap-2 mb-1">
+                    <h3 className="font-extrabold text-base sm:text-lg text-white tracking-wide truncate drop-shadow-sm">
+                      {card.cardName}
+                    </h3>
+                    <span className="tracking-widest font-mono text-[11px] text-zinc-400 shrink-0">
+                      {getMaskedCardNumber(card.id)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-zinc-300/90 tabular-num font-medium pt-1.5 border-t border-white/[0.08]">
+                    <div className="flex items-center gap-2.5">
+                      <span>Cut: <strong className="text-white">{card.statementDay}th</strong></span>
+                      <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
+                    </div>
+                    {card.creditLimit && card.creditLimit > 0 ? (
+                      <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                        {formatCreditLimit(card.creditLimit)} Limit
+                      </span>
+                    ) : (
+                      <span>Return: <strong className="text-amber-300">{card.benefits?.rewardRate?.basePercent || 1}%</strong></span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -557,7 +603,7 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                 <div
                   key={card.id}
                   onClick={() => handleSelectCardInDeck(idx)}
-                  className={`relative aspect-[1.586/1] w-full rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_12px_28px_rgba(0,0,0,0.7)] transition-all duration-300 hover:translate-y-[-8px] cursor-pointer active:scale-[0.99] ${isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_24px_rgba(245,158,11,0.3)]' : 'ring-1 ring-white/15'
+                  className={`relative aspect-[1.586/1] w-full rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_12px_28px_rgba(0,0,0,0.7)] transition-all duration-300 hover:translate-y-[-8px] cursor-pointer active:scale-[0.99] flex flex-col justify-between ${isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_24px_rgba(245,158,11,0.3)]' : 'ring-1 ring-white/15'
                     }`}
                   style={{
                     // Consistent ~68px tab exposure on every screen size
@@ -629,12 +675,39 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                     </h4>
                   </div>
 
-                  {/* Bottom row: Cut & Return (visible on bottom-most card or when space allows) */}
+                  {/* Expanded Card Details (Top Perks & Credit Limit) - Visible on bottom card or single card */}
                   {isLastCard && (
-                    <div className="relative z-10 flex items-center justify-between text-[10px] text-zinc-300/80 pt-1.5 border-t border-white/[0.08] tabular-num mt-2">
-                      <span>Cut: <strong className="text-white">{card.statementDay}th</strong></span>
-                      <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
-                      <span>Return: <strong className="text-amber-300">{card.benefits.rewardRate.basePercent}%</strong></span>
+                    <div className="relative z-10 mt-auto pt-3 flex flex-col justify-end gap-2.5">
+                      {/* Top Perks Badges */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {getCardTopPerks(card, 3).map((perk, pIdx) => (
+                          <span
+                            key={pIdx}
+                            className="px-2.5 py-1 rounded-xl bg-black/40 backdrop-blur-md text-[10.5px] font-semibold text-white/95 border border-white/15 flex items-center gap-1.5 shadow-sm"
+                          >
+                            {renderPerkIcon(perk.category)}
+                            <span>{perk.label}</span>
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Bottom Footer: Cut, Grace, Credit Limit & Masked Digits */}
+                      <div className="flex items-center justify-between text-xs text-zinc-300/90 pt-2 border-t border-white/[0.10] tabular-num font-medium">
+                        <div className="flex items-center gap-2.5 sm:gap-3">
+                          <span>Cut: <strong className="text-white">{card.statementDay}th</strong></span>
+                          <span>Grace: <strong className="text-white">+{card.dueDaysAfterStatement}d</strong></span>
+                          {card.creditLimit && card.creditLimit > 0 ? (
+                            <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                              {formatCreditLimit(card.creditLimit)} Limit
+                            </span>
+                          ) : (
+                            <span>Return: <strong className="text-amber-300">{card.benefits?.rewardRate?.basePercent || 1}%</strong></span>
+                          )}
+                        </div>
+                        <span className="tracking-widest font-mono text-[11px] text-zinc-400">
+                          {getMaskedCardNumber(card.id)}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>

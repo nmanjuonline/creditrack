@@ -164,3 +164,97 @@ export function scoreCardForSpend(
     rewardHighlight,
   };
 }
+
+export interface CardPerkBadge {
+  label: string;
+  category: 'lounge' | 'upi' | 'cashback' | 'forex' | 'rewards';
+}
+
+/**
+ * Extracts the top 2-3 superpower badges for a card face
+ */
+export function getCardTopPerks(card: CreditCard, max: number = 3): CardPerkBadge[] {
+  const perks: CardPerkBadge[] = [];
+
+  // 1. Airport Lounge Access
+  if (card.benefits?.domesticLounge?.available) {
+    const qtr = card.benefits.domesticLounge.countPerQuarter;
+    const label = qtr ? (String(qtr).toLowerCase() === 'unlimited' ? 'Unlimited Lounge' : `${qtr}/qtr Lounge`) : 'Airport Lounge';
+    perks.push({
+      label,
+      category: 'lounge',
+    });
+  }
+
+  // 2. RuPay UPI Feature
+  if (card.benefits?.isRupayUPI || card.cardNetwork === 'rupay') {
+    const upiHighlight = card.benefits?.cashbackHighlights?.find(c => 
+      c.category.toLowerCase().includes('upi') || c.rate.toLowerCase().includes('upi')
+    );
+    const rate = upiHighlight ? upiHighlight.rate.split(' ')[0] : '1.5%';
+    perks.push({
+      label: `${rate} UPI Back`,
+      category: 'upi',
+    });
+  }
+
+  // 3. Top Category Multiplier or Cashback
+  if (card.benefits?.cashbackHighlights && card.benefits.cashbackHighlights.length > 0) {
+    const nonUpi = card.benefits.cashbackHighlights.find(c => !c.category.toLowerCase().includes('upi')) || card.benefits.cashbackHighlights[0];
+    const cleanRate = nonUpi.rate.split(' ')[0] || nonUpi.rate;
+    const shortCategory = nonUpi.category
+      .replace(/\(.*?\)/g, '')
+      .replace(/Spends|Brands|Payments/gi, '')
+      .trim()
+      .slice(0, 14);
+    perks.push({
+      label: `${cleanRate} ${shortCategory || 'Cashback'}`,
+      category: 'cashback',
+    });
+  } else if (card.benefits?.rewardRate?.multipliers && card.benefits.rewardRate.multipliers.length > 0) {
+    const topMult = card.benefits.rewardRate.multipliers[0];
+    const shortCategory = topMult.category.replace(/\(.*?\)/g, '').trim().slice(0, 14);
+    perks.push({
+      label: `${topMult.rate.split(' ')[0]} ${shortCategory}`,
+      category: 'rewards',
+    });
+  }
+
+  // 4. Low Forex (<= 2%)
+  if (perks.length < max && card.benefits?.forexMarkup?.ratePercent && card.benefits.forexMarkup.ratePercent <= 2) {
+    perks.push({
+      label: `${card.benefits.forexMarkup.ratePercent}% Forex`,
+      category: 'forex',
+    });
+  }
+
+  // 5. Base Reward Rate fallback if still under max
+  if (perks.length < 2 && card.benefits?.rewardRate?.basePercent) {
+    perks.push({
+      label: `${card.benefits.rewardRate.basePercent}% Base Return`,
+      category: 'rewards',
+    });
+  }
+
+  return perks.slice(0, max);
+}
+
+/**
+ * Formats a credit limit amount into standard INR notation with separators (e.g. ₹5,00,000)
+ */
+export function formatCreditLimit(amount?: number): string | null {
+  if (!amount || amount <= 0) return null;
+  return `₹${amount.toLocaleString('en-IN')}`;
+}
+
+/**
+ * Deterministically generates a masked 4-digit card number for authentic card aesthetics
+ */
+export function getMaskedCardNumber(cardId: string): string {
+  let num = 0;
+  for (let i = 0; i < cardId.length; i++) {
+    num = (num * 31 + cardId.charCodeAt(i)) % 9000;
+  }
+  const digits = 1000 + Math.abs(num);
+  return `•••• ${digits}`;
+}
