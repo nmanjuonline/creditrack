@@ -126,13 +126,14 @@ export const CardList: React.FC<CardListProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* View Switcher: Apple Segmented Pill */}
+      {/* Header: Card count & mobile view switcher */}
       <div className="flex items-center justify-between px-1">
         <div className="text-xs font-medium text-slate-400 tabular-num">
           Showing <span className="text-white font-bold">{sortedCards.length}</span> {sortedCards.length === 1 ? 'card' : 'cards'}
         </div>
 
-        <div className="flex items-center bg-black/40 backdrop-blur-xl p-1 rounded-full border border-white/[0.08]" role="tablist" aria-label="View format">
+        {/* View Switcher: Only displayed on mobile (< md); desktop is strictly Grid view */}
+        <div className="flex md:hidden items-center bg-black/40 backdrop-blur-xl p-1 rounded-full border border-white/[0.08]" role="tablist" aria-label="Mobile view format">
           <button
             type="button"
             onClick={() => setViewMode('stack')}
@@ -147,7 +148,7 @@ export const CardList: React.FC<CardListProps> = ({
             title="Swipeable Wallet Stack"
           >
             <Layers className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Stack</span>
+            <span>Stack</span>
           </button>
           <button
             type="button"
@@ -163,39 +164,57 @@ export const CardList: React.FC<CardListProps> = ({
             title="Grid View"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Grid</span>
+            <span>Grid</span>
           </button>
         </div>
       </div>
 
-      {/* Render selected view */}
-      {viewMode === 'stack' ? (
-        <WalletStack
-          cards={sortedCards}
-          onViewBenefits={onViewBenefits}
-          onEditCard={onEditCard}
-          onDeleteCard={onDeleteCard}
-          onRefreshBenefits={onRefreshBenefits}
-          onToggleFavorite={onToggleFavorite}
-          refreshingCardId={refreshingCardId}
-          onAddCard={onAddCard}
-        />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedCards.map(card => (
-            <CreditCardItem
-              key={card.id}
-              card={card}
-              onViewBenefits={onViewBenefits}
-              onEditCard={onEditCard}
-              onDeleteCard={onDeleteCard}
-              onRefreshBenefits={onRefreshBenefits}
-              onToggleFavorite={onToggleFavorite}
-              isRefreshing={refreshingCardId === card.id}
-            />
-          ))}
-        </div>
-      )}
+      {/* Mobile view (< md): Stack or Grid based on viewMode toggle */}
+      <div className="md:hidden">
+        {viewMode === 'stack' ? (
+          <WalletStack
+            cards={sortedCards}
+            onViewBenefits={onViewBenefits}
+            onEditCard={onEditCard}
+            onDeleteCard={onDeleteCard}
+            onRefreshBenefits={onRefreshBenefits}
+            onToggleFavorite={onToggleFavorite}
+            refreshingCardId={refreshingCardId}
+            onAddCard={onAddCard}
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-5">
+            {sortedCards.map(card => (
+              <CreditCardItem
+                key={card.id}
+                card={card}
+                onViewBenefits={onViewBenefits}
+                onEditCard={onEditCard}
+                onDeleteCard={onDeleteCard}
+                onRefreshBenefits={onRefreshBenefits}
+                onToggleFavorite={onToggleFavorite}
+                isRefreshing={refreshingCardId === card.id}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop view (>= md): Strictly Grid view (Stack view is not required or displayed on desktop) */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedCards.map(card => (
+          <CreditCardItem
+            key={card.id}
+            card={card}
+            onViewBenefits={onViewBenefits}
+            onEditCard={onEditCard}
+            onDeleteCard={onDeleteCard}
+            onRefreshBenefits={onRefreshBenefits}
+            onToggleFavorite={onToggleFavorite}
+            isRefreshing={refreshingCardId === card.id}
+          />
+        ))}
+      </div>
     </div>
   );
 };
