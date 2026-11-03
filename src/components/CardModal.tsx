@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { CreditCard, CardNetwork } from '../types/card';
 import { POPULAR_BANKS, CARD_CATALOG, findInCatalog } from '../data/cardCatalog';
-import { X, Sparkles, Info } from 'lucide-react';
+import { X, Sparkles, Info, Check } from 'lucide-react';
 
 interface CardModalProps {
   isOpen: boolean;
@@ -38,8 +38,26 @@ export const CardModal: React.FC<CardModalProps> = ({
   const [cardColor, setCardColor] = useState(editingCard?.cardColor || COLOR_OPTIONS[0].id);
   const [notes, setNotes] = useState(editingCard?.notes || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
+  const [isCardDropdownOpen, setIsCardDropdownOpen] = useState(false);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const bankContainerRef = useRef<HTMLDivElement>(null);
+  const cardContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close custom dropdowns on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (bankContainerRef.current && !bankContainerRef.current.contains(e.target as Node)) {
+        setIsBankDropdownOpen(false);
+      }
+      if (cardContainerRef.current && !cardContainerRef.current.contains(e.target as Node)) {
+        setIsCardDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   // Auto-focus first input when modal opens
   useEffect(() => {
@@ -84,6 +102,14 @@ export const CardModal: React.FC<CardModalProps> = ({
 
   const cardSuggestions = CARD_CATALOG.filter(c => 
     !bankName || c.bankName.toLowerCase().includes(bankName.toLowerCase()) || bankName.toLowerCase().includes(c.bankName.toLowerCase())
+  );
+
+  const filteredBanks = POPULAR_BANKS.filter(b => 
+    !bankName.trim() || b.toLowerCase().includes(bankName.toLowerCase().trim())
+  );
+
+  const matchingCards = cardSuggestions.filter(c => 
+    !cardName.trim() || c.cardName.toLowerCase().includes(cardName.toLowerCase().trim())
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,7 +178,7 @@ export const CardModal: React.FC<CardModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Bank / Provider Selection */}
-          <div>
+          <div ref={bankContainerRef} className="relative">
             <label htmlFor="card-bank-input" className="block text-xs font-semibold text-zinc-200 mb-1.5">
               Card Provider / Bank *
             </label>
@@ -160,42 +186,113 @@ export const CardModal: React.FC<CardModalProps> = ({
               id="card-bank-input"
               ref={firstInputRef}
               type="text"
-              list="popular-banks"
+              autoComplete="off"
               value={bankName}
-              onChange={e => handleBankSelect(e.target.value)}
+              onFocus={() => setIsBankDropdownOpen(true)}
+              onChange={e => {
+                handleBankSelect(e.target.value);
+                setIsBankDropdownOpen(true);
+              }}
               placeholder="e.g. HDFC Bank, ICICI Bank, SBI Card, American Express..."
               required
-              className="w-full px-4 py-3 rounded-xl glass-input text-sm text-white placeholder-zinc-500 focus:outline-none transition-all min-h-[44px]"
+              className="w-full px-4 py-3 rounded-xl glass-input text-sm text-white placeholder-slate-500 focus:outline-none transition-all min-h-[44px]"
             />
-            <datalist id="popular-banks">
-              {POPULAR_BANKS.map(bank => (
-                <option key={bank} value={bank} />
-              ))}
-            </datalist>
+
+            {/* Apple-Style Custom Bank Dropdown */}
+            {isBankDropdownOpen && filteredBanks.length > 0 && (
+              <div 
+                className="absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto bg-[#12151e]/95 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl p-1.5 space-y-0.5 no-scrollbar animate-in fade-in zoom-in-95 duration-100"
+                role="listbox"
+                aria-label="Popular Banks"
+              >
+                <div className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  Select Provider
+                </div>
+                {filteredBanks.map(bank => {
+                  const isSelected = bankName.toLowerCase() === bank.toLowerCase();
+                  return (
+                    <button
+                      key={bank}
+                      type="button"
+                      onClick={() => {
+                        handleBankSelect(bank);
+                        setIsBankDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs text-left transition-colors min-h-[40px] ${
+                        isSelected
+                          ? 'bg-amber-400/20 text-amber-200 font-semibold'
+                          : 'text-slate-200 hover:bg-white/[0.08] hover:text-white'
+                      }`}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <span>{bank}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Card Name / Type */}
-          <div>
+          {/* Card Name / Type Selection */}
+          <div ref={cardContainerRef} className="relative">
             <label htmlFor="card-name-input" className="block text-xs font-semibold text-zinc-200 mb-1.5">
               Card Name / Model *
             </label>
             <input
               id="card-name-input"
               type="text"
-              list="card-suggestions"
+              autoComplete="off"
               value={cardName}
-              onChange={e => handleCardNameSelect(e.target.value)}
+              onFocus={() => setIsCardDropdownOpen(true)}
+              onChange={e => {
+                handleCardNameSelect(e.target.value);
+                setIsCardDropdownOpen(true);
+              }}
               placeholder="e.g. Regalia Gold, Infinia Metal, Amazon Pay, Platinum Travel..."
               required
-              className="w-full px-4 py-3 rounded-xl glass-input text-sm text-white placeholder-zinc-500 focus:outline-none transition-all min-h-[44px]"
+              className="w-full px-4 py-3 rounded-xl glass-input text-sm text-white placeholder-slate-500 focus:outline-none transition-all min-h-[44px]"
             />
-            <datalist id="card-suggestions">
-              {cardSuggestions.map(card => (
-                <option key={card.cardName} value={card.cardName}>
-                  {card.bankName} - {card.cardName}
-                </option>
-              ))}
-            </datalist>
+
+            {/* Apple-Style Custom Card Suggestions Dropdown */}
+            {isCardDropdownOpen && matchingCards.length > 0 && (
+              <div 
+                className="absolute left-0 right-0 z-30 mt-1 max-h-56 overflow-y-auto bg-[#12151e]/95 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl p-1.5 space-y-0.5 no-scrollbar animate-in fade-in zoom-in-95 duration-100"
+                role="listbox"
+                aria-label="Card Suggestions"
+              >
+                <div className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  Catalog Matches {bankName ? `(${bankName})` : ''}
+                </div>
+                {matchingCards.map(card => {
+                  const isSelected = cardName.toLowerCase() === card.cardName.toLowerCase();
+                  return (
+                    <button
+                      key={`${card.bankName}-${card.cardName}`}
+                      type="button"
+                      onClick={() => {
+                        handleCardNameSelect(card.cardName);
+                        setIsCardDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs text-left transition-colors min-h-[44px] ${
+                        isSelected
+                          ? 'bg-amber-400/20 text-amber-200 font-semibold'
+                          : 'text-slate-200 hover:bg-white/[0.08] hover:text-white'
+                      }`}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <div>
+                        <div className="font-semibold text-white">{card.cardName}</div>
+                        <div className="text-[10px] text-slate-400">{card.bankName} • {card.network.toUpperCase()}</div>
+                      </div>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Card Network Selector */}
@@ -203,26 +300,29 @@ export const CardModal: React.FC<CardModalProps> = ({
             <span className="block text-xs font-semibold text-zinc-200 mb-1.5">
               Card Network
             </span>
-            <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-label="Card network selection">
-              {(['visa', 'mastercard', 'rupay', 'amex', 'diners'] as CardNetwork[]).map(net => (
-                <button
-                  type="button"
-                  key={net}
-                  onClick={() => setCardNetwork(net)}
-                  className={`py-2 px-1 rounded-xl text-xs font-bold uppercase transition-all border min-h-[44px] ${
-                    cardNetwork === net
-                      ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm'
-                      : 'bg-white/[0.04] text-zinc-400 border-white/[0.08] hover:border-white/20 hover:text-white'
-                  }`}
-                  role="radio"
-                  aria-checked={cardNetwork === net}
-                >
-                  {net}
-                </button>
-              ))}
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2" role="radiogroup" aria-label="Card network selection">
+              {(['visa', 'mastercard', 'rupay', 'amex', 'diners'] as CardNetwork[]).map(net => {
+                const isSelected = cardNetwork === net;
+                return (
+                  <button
+                    type="button"
+                    key={net}
+                    onClick={() => setCardNetwork(net)}
+                    className={`py-2.5 px-2 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all duration-150 active:scale-95 border min-h-[44px] flex items-center justify-center ${
+                      isSelected
+                        ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm font-bold ring-1 ring-amber-400/30'
+                        : 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:border-white/20 hover:text-white'
+                    }`}
+                    role="radio"
+                    aria-checked={isSelected}
+                  >
+                    <span>{net}</span>
+                  </button>
+                );
+              })}
             </div>
             {cardNetwork === 'rupay' && (
-              <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1 font-medium">
+              <p className="text-[11px] text-emerald-400 mt-1.5 flex items-center gap-1 font-medium">
                 RuPay card detected: UPI scan-and-pay enabled.
               </p>
             )}

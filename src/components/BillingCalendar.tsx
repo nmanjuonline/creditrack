@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import type { CreditCard } from '../types/card';
 import { calculateBillingCycle, formatDate } from '../utils/billingUtils';
 import { 
-  Calendar as CalendarIcon, 
   ChevronLeft, 
   ChevronRight, 
   Clock, 
@@ -114,39 +113,35 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
     <section className="space-y-8" aria-label="Billing Calendar and Timeline">
       {/* Calendar Card in Frosted Glass */}
       <div className="glass-panel rounded-3xl p-6 sm:p-7 shadow-2xl">
-        {/* Calendar Navigation Header */}
-        <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-400/15 text-amber-300 flex items-center justify-center border border-amber-400/30" aria-hidden="true">
-              <CalendarIcon className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">{monthName}</h2>
-              <p className="text-xs text-zinc-400">Statement generation & bill payment schedule</p>
-            </div>
+        {/* Apple Calendar Navigation Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-white/[0.08] mb-5">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{monthName}</h2>
+            <p className="text-xs text-slate-400 mt-0.5">Statement generation & bill payment schedule</p>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* iOS Segmented Navigation Pill: < Today > */}
+          <div className="flex items-center self-start sm:self-auto bg-black/40 backdrop-blur-xl p-1 rounded-full border border-white/[0.08]">
             <button
               onClick={prevMonth}
-              className="p-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.10] text-zinc-300 border border-white/[0.08] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="w-9 h-9 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] active:scale-95 transition-all flex items-center justify-center min-h-[44px] min-w-[44px]"
               aria-label="Previous month"
             >
-              <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </button>
             <button
               onClick={() => setCurrentDate(new Date())}
-              className="px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.10] text-xs font-semibold text-zinc-200 border border-white/[0.08] transition-colors min-h-[44px]"
+              className="px-4 py-2 rounded-full text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/[0.08] active:scale-95 transition-all min-h-[44px]"
               aria-label="Jump to current month"
             >
               Today
             </button>
             <button
               onClick={nextMonth}
-              className="p-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.10] text-zinc-300 border border-white/[0.08] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="w-9 h-9 rounded-full text-slate-300 hover:text-white hover:bg-white/[0.08] active:scale-95 transition-all flex items-center justify-center min-h-[44px] min-w-[44px]"
               aria-label="Next month"
             >
-              <ChevronRight className="w-5 h-5" aria-hidden="true" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -198,7 +193,7 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
             return (
               <div
                 key={`day-${day}`}
-                className={`h-16 sm:h-24 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border flex flex-col justify-between transition-all overflow-hidden ${
+                className={`h-14 sm:h-24 p-1 sm:p-2 rounded-xl sm:rounded-2xl border flex flex-col justify-between transition-all overflow-hidden ${
                   isToday
                     ? 'bg-amber-400/[0.08] border-amber-400/50 ring-1 ring-amber-400/30'
                     : events.length > 0
@@ -208,28 +203,41 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
                 role="gridcell"
                 aria-label={`${day} ${monthName}, ${events.length} card events`}
               >
-                <div className="flex items-center justify-between">
-                  <span className={`text-[11px] sm:text-xs font-bold tabular-num ${isToday ? 'text-amber-300' : 'text-zinc-400'}`}>
-                    {day}
-                  </span>
+                {/* Day Number Header: Apple iOS Calendar Style (Circle for Today, never overflows) */}
+                <div className="flex items-center justify-center sm:justify-between w-full">
+                  {isToday ? (
+                    <span className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shadow-md tabular-num">
+                      {day}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-slate-300 tabular-num">
+                      {day}
+                    </span>
+                  )}
                   {isToday && (
-                    <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/15 px-1 rounded">
+                    <span className="hidden sm:inline text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/15 px-1.5 py-0.5 rounded">
                       TODAY
                     </span>
                   )}
                 </div>
 
-                {/* Event Badges */}
-                <div className="space-y-0.5 sm:space-y-1 overflow-y-auto no-scrollbar">
+                {/* Mobile: Apple Calendar Colored Dots (Never truncate into 'Flo...' or 'Cut') */}
+                <div className="flex items-center justify-center gap-1 py-1 sm:hidden">
+                  {statementEvents.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-sm" title="Statement cut" />}
+                  {dueEvents.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shadow-sm" title="Payment due" />}
+                  {optimalEvents.length > 0 && statementEvents.length === 0 && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm" title="Optimal float" />}
+                </div>
+
+                {/* Tablet / Desktop: Event Badges */}
+                <div className="hidden sm:block space-y-1 w-full overflow-y-auto no-scrollbar">
                   {statementEvents.map((ev, i) => (
                     <button
                       key={`stmt-${i}`}
                       onClick={() => onSelectCard(ev.card)}
-                      className="w-full text-left truncate px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/25 hover:opacity-80 block"
+                      className="w-full text-left truncate px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/25 hover:opacity-80 block"
                       aria-label={`${ev.card.cardName} statement cut on ${day} ${monthName}`}
                     >
-                      <span className="sm:hidden">Cut</span>
-                      <span className="hidden sm:inline">{ev.card.cardName.split(' ')[0]} cut</span>
+                      {ev.card.cardName.split(' ')[0]} cut
                     </button>
                   ))}
 
@@ -237,21 +245,19 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
                     <button
                       key={`due-${i}`}
                       onClick={() => onSelectCard(ev.card)}
-                      className="w-full text-left truncate px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/25 hover:opacity-80 block"
+                      className="w-full text-left truncate px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/25 hover:opacity-80 block"
                       aria-label={`${ev.card.cardName} bill due on ${day} ${monthName}`}
                     >
-                      <span className="sm:hidden">Due</span>
-                      <span className="hidden sm:inline">{ev.card.cardName.split(' ')[0]} due</span>
+                      {ev.card.cardName.split(' ')[0]} due
                     </button>
                   ))}
 
                   {optimalEvents.length > 0 && statementEvents.length === 0 && (
                     <div
-                      className="truncate px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      className="truncate px-1.5 py-0.5 rounded text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                       title="Optimal spending window"
                     >
-                      <span className="sm:hidden">Float</span>
-                      <span className="hidden sm:inline">Max Float</span>
+                      Max Float
                     </div>
                   )}
                 </div>

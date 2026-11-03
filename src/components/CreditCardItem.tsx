@@ -115,55 +115,71 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
         </div>
       </div>
 
-      {/* Billing Cycle Intelligence Bar */}
-      <div className="p-4 bg-black/25 border-b border-white/[0.06] space-y-2.5">
-        <div className="flex items-center justify-between text-xs">
-          {/* Statement Countdown */}
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-zinc-400" aria-hidden="true" />
-            <span className="text-zinc-400">Statement Cut:</span>
-            <span className={`font-semibold tabular-num ${
-              calc.daysUntilStatement <= 2 ? 'text-amber-400' : 'text-zinc-200'
-            }`}>
-              {calc.daysUntilStatement === 0 ? 'Today!' : `in ${calc.daysUntilStatement}d`}
-            </span>
-            <span className="text-[10px] text-slate-400 tabular-num">
-              ({calc.nextStatementDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})
-            </span>
+      {/* Apple-Style Billing Intelligence Widget */}
+      <div className="p-4 bg-black/20 border-b border-white/[0.06] space-y-2.5">
+        {/* Float Runway Banner */}
+        <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.07]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-400/15 text-amber-300 flex items-center justify-center border border-amber-400/30 shrink-0">
+              <Sparkles className="w-4 h-4 text-amber-400" aria-hidden="true" />
+            </div>
+            <div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Interest-Free Float</div>
+              <div className="text-[10px] text-slate-300">Runway if spent today</div>
+            </div>
           </div>
-
-          {/* Payment Due Countdown */}
-          <div className="flex items-center gap-1.5">
-            {calc.isBillPaymentUrgent ? (
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-400 animate-bounce" aria-hidden="true" />
-            ) : null}
-            <span className="text-zinc-400">Due:</span>
-            <span className={`font-semibold tabular-num ${
-              calc.daysUntilDue <= 3 ? 'text-rose-400' : 'text-zinc-200'
-            }`}>
-              {calc.daysUntilDue === 0 ? 'Today!' : `in ${calc.daysUntilDue}d`}
-            </span>
-            <span className="text-[10px] text-slate-400 tabular-num">
-              ({calc.nextDueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})
-            </span>
+          <div className={`px-2.5 py-1 rounded-xl text-xs font-black tabular-num tracking-wide shrink-0 border ${
+            calc.floatDaysIfSpentToday >= 40
+              ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm'
+              : calc.daysUntilStatement <= 3
+              ? 'bg-rose-950/40 text-rose-300 border-rose-800/40'
+              : 'bg-white/[0.06] text-white border-white/10'
+          }`}>
+            {calc.floatDaysIfSpentToday} DAYS
           </div>
         </div>
 
-        {/* Float days badge in Warm Gold */}
-        <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-            <span className="text-zinc-300">Interest-Free Float:</span>
+        {/* Two-Column Structured Dates (Statement Cut & Payment Due) */}
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          {/* Statement Cut */}
+          <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+              <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+              <span className="text-[11px] font-medium">Statement Cut</span>
+            </div>
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className={`text-sm font-bold tabular-num ${
+                calc.daysUntilStatement <= 2 ? 'text-amber-400' : 'text-white'
+              }`}>
+                {calc.daysUntilStatement === 0 ? 'Today!' : `in ${calc.daysUntilStatement}d`}
+              </span>
+              <span className="text-[11px] text-slate-400 tabular-num">
+                ({calc.nextStatementDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})
+              </span>
+            </div>
           </div>
-          <span className={`font-bold px-2.5 py-0.5 rounded text-xs tabular-num ${
-            calc.floatDaysIfSpentToday >= 40
-              ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30'
-              : calc.daysUntilStatement <= 3
-              ? 'bg-rose-950/40 text-rose-300 border border-rose-800/40'
-              : 'bg-white/[0.06] text-zinc-300'
-          }`}>
-            {calc.floatDaysIfSpentToday} Days if spent today
-          </span>
+
+          {/* Payment Due */}
+          <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+              {calc.isBillPaymentUrgent ? (
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-400 animate-bounce shrink-0" aria-hidden="true" />
+              ) : (
+                <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+              )}
+              <span className="text-[11px] font-medium">Payment Due</span>
+            </div>
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className={`text-sm font-bold tabular-num ${
+                calc.daysUntilDue <= 3 ? 'text-rose-400 font-extrabold' : 'text-white'
+              }`}>
+                {calc.daysUntilDue === 0 ? 'Today!' : `in ${calc.daysUntilDue}d`}
+              </span>
+              <span className="text-[11px] text-slate-400 tabular-num">
+                ({calc.nextDueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

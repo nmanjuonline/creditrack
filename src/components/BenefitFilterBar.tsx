@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, 
   SlidersHorizontal, 
@@ -11,7 +11,9 @@ import {
   Utensils, 
   Fuel, 
   Film, 
-  Sparkles 
+  Sparkles,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 
 export type BenefitQuickFilter = 
@@ -55,6 +57,14 @@ const FILTER_PILLS: { id: BenefitQuickFilter; label: string; icon: React.ReactNo
   { id: 'movies', label: 'Movies & Events', icon: <Film className="w-3.5 h-3.5" aria-hidden="true" /> },
 ];
 
+const SORT_OPTIONS: { id: CardSortOption; label: string }[] = [
+  { id: 'float_desc', label: 'Longest Float Runway' },
+  { id: 'statement_asc', label: 'Earliest Statement Cut' },
+  { id: 'due_asc', label: 'Payment Due Soonest' },
+  { id: 'reward_desc', label: 'Highest Base Reward %' },
+  { id: 'name_asc', label: 'Card Name (A-Z)' },
+];
+
 export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
   searchQuery,
   setSearchQuery,
@@ -65,6 +75,20 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
   totalCardsCount,
   filteredCount,
 }) => {
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setIsSortOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const currentSortLabel = SORT_OPTIONS.find(o => o.id === sortOption)?.label || 'Sort Cards';
   return (
     <div className="space-y-3.5 mb-6">
       {/* Search Input & Sort Dropdown */}
@@ -90,23 +114,56 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
           )}
         </div>
 
-        {/* Sort Dropdown */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl glass-panel text-xs text-zinc-300">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400/80" />
-            <span className="text-zinc-400">Sort:</span>
-            <select
-              value={sortOption}
-              onChange={e => setSortOption(e.target.value as CardSortOption)}
-              className="bg-transparent text-white font-medium focus:outline-none cursor-pointer text-xs"
+        {/* Apple-Style Custom Sort Menu */}
+        <div ref={sortRef} className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsSortOpen(!isSortOpen)}
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-full glass-panel text-xs font-semibold text-slate-200 hover:text-white border border-white/10 shadow-sm transition-all active:scale-95 min-h-[44px]"
+            aria-haspopup="listbox"
+            aria-expanded={isSortOpen}
+            aria-label={`Sort by: ${currentSortLabel}`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-slate-400">Sort:</span>
+            <span className="text-white font-medium">{currentSortLabel}</span>
+            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isSortOpen && (
+            <div 
+              className="absolute right-0 mt-1.5 w-56 bg-[#12151e]/95 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl p-1.5 space-y-0.5 z-40 animate-in fade-in zoom-in-95 duration-100"
+              role="listbox"
+              aria-label="Sort options"
             >
-              <option value="float_desc" className="bg-[#0c0f16] text-white">Longest Float Runway</option>
-              <option value="statement_asc" className="bg-[#0c0f16] text-white">Earliest Statement Cut</option>
-              <option value="due_asc" className="bg-[#0c0f16] text-white">Payment Due Soonest</option>
-              <option value="reward_desc" className="bg-[#0c0f16] text-white">Highest Base Reward %</option>
-              <option value="name_asc" className="bg-[#0c0f16] text-white">Card Name (A-Z)</option>
-            </select>
-          </div>
+              <div className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                Sort Cards By
+              </div>
+              {SORT_OPTIONS.map(opt => {
+                const isSelected = sortOption === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => {
+                      setSortOption(opt.id);
+                      setIsSortOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs text-left transition-colors min-h-[40px] ${
+                      isSelected
+                        ? 'bg-amber-400/20 text-amber-200 font-semibold'
+                        : 'text-slate-200 hover:bg-white/[0.08] hover:text-white'
+                    }`}
+                    role="option"
+                    aria-selected={isSelected}
+                  >
+                    <span>{opt.label}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
