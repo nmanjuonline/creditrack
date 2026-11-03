@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-03T19:57:00Z",
+  "title": "Design System: CrediTrack",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Champagne Gold",
+        "canonical": "oklch(76% 0.14 85)",
+        "tonalRamp": ["#3a2e0a", "#614d11", "#876c18", "#ad8a1f", "#d4af37", "#e5c04b", "#f0d478", "#fae8ab"]
+      },
+      "surface-obsidian": {
+        "role": "neutral",
+        "displayName": "Obsidian Void",
+        "canonical": "oklch(12% 0.01 260)",
+        "tonalRamp": ["#040507", "#08090d", "#10121a", "#181c28", "#242a3b", "#353d52", "#4b5670", "#697799"]
+      },
+      "surface-graphite": {
+        "role": "neutral",
+        "displayName": "Graphite Glass",
+        "canonical": "rgba(18, 21, 29, 0.70)",
+        "tonalRamp": ["#0b0c11", "#12151d", "#1b1f2b", "#262b3a", "#333b4e", "#444e66", "#596684", "#7483a6"]
+      },
+      "status-float": {
+        "role": "secondary",
+        "displayName": "Optimal Float Amber",
+        "canonical": "oklch(72% 0.17 65)",
+        "tonalRamp": ["#451a03", "#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fde68a"]
+      },
+      "status-due": {
+        "role": "secondary",
+        "displayName": "Urgent Due Crimson",
+        "canonical": "oklch(62% 0.22 25)",
+        "tonalRamp": ["#4c0519", "#881337", "#9f1239", "#be123c", "#e11d48", "#f43f5e", "#fb7185", "#fecdd3"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headers and primary dashboard metrics." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles and prominent modal headings." },
+      "title": { "displayName": "Title", "purpose": "Card titles and group headers." },
+      "body": { "displayName": "Body", "purpose": "Benefit breakdowns and explanatory copy." },
+      "label": { "displayName": "Label", "purpose": "Status badges, float countdowns, and quick filter chips." }
+    },
+    "shadows": [
+      {
+        "name": "glass-panel",
+        "value": "0 12px 40px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12)",
+        "purpose": "Primary container elevation on dashboards and modal sheets."
+      },
+      {
+        "name": "card-lift",
+        "value": "0 16px 48px -8px rgba(0, 0, 0, 0.50), inset 0 1px 1px 0 rgba(255, 255, 255, 0.14)",
+        "purpose": "Simulates an authentic ISO ID-1 physical credit card hovering above the glass canvas."
+      },
+      {
+        "name": "btn-gold-glow",
+        "value": "0 4px 20px rgba(212, 175, 55, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.35)",
+        "purpose": "Tactile metallic aura under primary champagne gold buttons."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Fluid state transitions for cards and buttons."
+      },
+      {
+        "name": "spring-tactile",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Tactile modal slide-up and card deck expansion physics."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Metallic Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary high-conviction action trigger (Add Card, Save, Refresh).",
+      "html": "<button class=\"ds-btn-gold\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg><span>Add Card</span></button>",
+      "css": ".ds-btn-gold { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #d4af37 0%, #b8932e 50%, #997722 100%); color: #08090d; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; font-weight: 700; height: 44px; padding: 0 20px; border-radius: 12px; border: none; box-shadow: 0 4px 20px rgba(212, 175, 55, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.35); cursor: pointer; transition: all 0.2s ease-in-out; } .ds-btn-gold:hover { background: linear-gradient(135deg, #e5c04b 0%, #c5a039 50%, #a8842d 100%); box-shadow: 0 6px 24px rgba(212, 175, 55, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.5); transform: translateY(-1px); } .ds-btn-gold:active { transform: scale(0.96); }"
+    },
+    {
+      "name": "Float Status Badge",
+      "kind": "chip",
+      "refersTo": "status-float",
+      "description": "Signals interest-free grace and float days remaining on card face.",
+      "html": "<span class=\"ds-float-badge\">48D Float</span>",
+      "css": ".ds-float-badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 9999px; background: rgba(245, 158, 11, 0.20); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.40); font-family: 'SF Mono', monospace; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Credit Card Perk Pill",
+      "kind": "chip",
+      "refersTo": "card-perk",
+      "description": "Frosted glass badge on physical card faces with vector icon.",
+      "html": "<span class=\"ds-perk-pill\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fde68a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z\"/></svg><span>2/qtr Lounge</span></span>",
+      "css": ".ds-perk-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 9999px; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10.5px; font-weight: 600; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); white-space: nowrap; }"
+    },
+    {
+      "name": "Glass Form Input",
+      "kind": "input",
+      "refersTo": "input-glass",
+      "description": "Dark glass input container with champagne gold focus aura.",
+      "html": "<input type=\"text\" class=\"ds-glass-input\" placeholder=\"e.g. HDFC Bank, SBI Card...\" value=\"HDFC Bank\" />",
+      "css": ".ds-glass-input { width: 100%; box-sizing: border-box; background: rgba(10, 13, 19, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.10); color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; height: 44px; padding: 0 16px; border-radius: 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; } .ds-glass-input:focus { border-color: rgba(212, 175, 55, 0.60); box-shadow: 0 0 20px rgba(212, 175, 55, 0.20); }"
+    },
+    {
+      "name": "Quick Filter Segmented Pill",
+      "kind": "chip",
+      "refersTo": "filter-pill",
+      "description": "Segmented tab pill for category filtering (All, Lounge, Fuel, UPI).",
+      "html": "<button class=\"ds-filter-pill-active\"><span>Optimal Float</span></button>",
+      "css": ".ds-filter-pill-active { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 16px; border-radius: 9999px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #020617; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 12px; font-weight: 700; border: none; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.30); cursor: pointer; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Obsidian Vault",
+    "overview": "CrediTrack's design system evokes the tactile, secure atmosphere of an executive private banking vault combined with the fluid precision of Apple Wallet. Surfaces are carved out of deep obsidian black glass, suspended over ambient dark gradients, and accentuated with chamfered champagne gold highlights. The visual language conveys high-conviction luxury, mathematical clarity, and absolute discretion.\n\nRather than flat SaaS dashboards or cluttered banking portals, CrediTrack presents credit cards as physical digital artifacts. Each card honors the ISO/IEC 7810 ID-1 standard ratio (~1.586:1) with specular rim lighting, realistic EMV chips, contactless telemetry, and curated benefit pills. On mobile devices, cards layer within a tactile gesture-driven deck; on desktop screens, they distribute cleanly across a multi-column responsive grid.",
+    "keyCharacteristics": [
+      "Obsidian Specular Glass: Translucent dark materials (rgba(18, 21, 29, 0.70)) with 24px backdrop blur and inset 1px specular highlight rims.",
+      "Champagne Gold Accents: Warm metallic gold (#d4af37) reserved strictly for high-value affordances, primary triggers, and active card states.",
+      "Physical Card Fidelity: ISO/IEC 7810 ID-1 proportioned cards with EMV chip geometry, masked digits, and metallic gradients.",
+      "Zero Emoji Vector Purity: 100% SVG vector iconography (Lucide) ensuring crisp rendering on Retina and OLED displays.",
+      "Indian Financial Fluency: Native typography formatting for Indian currency (en-IN separators, Lakhs, Crores)."
+    ],
+    "rules": [
+      { "name": "The Rarity of Gold Rule", "body": "Champagne gold is strictly limited to <= 10% of any screen surface. It denotes actionable currency and active states; it is never used for decorative wallpaper.", "section": "colors" },
+      { "name": "The No Watermark Collision Rule", "body": "Card text (numbers, dates, limits) must never overlap background watermarks. Card networks are displayed via dedicated crisp corner badges.", "section": "colors" },
+      { "name": "The Tabular Currency Rule", "body": "Every monetary amount (e.g. Limit: ₹5,00,000), percentage (e.g. 1.5%), and countdown timer (48d Float) must use monospace tabular numbers to eliminate layout jitter.", "section": "typography" },
+      { "name": "The Indian Denomination Rule", "body": "Large limits must include explicit Indian comma separators (₹12,50,000) and live conversational previews (₹12.5 Lakh) to guarantee immediate readability.", "section": "typography" },
+      { "name": "The Rim Light Rule", "body": "Every elevated glass surface must feature an inset 0 1px 0 rgba(255, 255, 255, 0.10) top highlight, simulating light refracting through the top edge of polished glass.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do format all credit limits with standard Indian comma grouping (e.g. Limit: ₹5,00,000).",
+      "Do enforce whitespace-nowrap shrink-0 on credit limit and category multiplier badges to prevent ugly line wrapping.",
+      "Do preserve strictly monotonic zIndex: idx + 1 in card stack decks so cards overlap with uniform mathematical exposure.",
+      "Do maintain a strict minimum 44x44px touch target on all clickable controls.",
+      "Do use vector Lucide SVG icons exclusively for all perks, categories, and controls."
+    ],
+    "donts": [
+      "Don't include emojis in any part of the UI, data schemas, perk badges, or notifications.",
+      "Don't display background text watermarks behind card numbers, cut dates, or limits.",
+      "Don't render the stack deck switcher or deck view on desktop screens (>= 768px).",
+      "Don't auto-focus form inputs when editing an existing card or on mobile touchscreens.",
+      "Don't request or collect 16-digit card numbers, CVVs, expiration dates, or bank login credentials."
+    ]
+  }
+}
