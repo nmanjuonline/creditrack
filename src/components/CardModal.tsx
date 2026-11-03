@@ -68,10 +68,20 @@ export const CardModal: React.FC<CardModalProps> = ({
   const cardContainerRef = useRef<HTMLDivElement>(null);
 
   const [prevCardId, setPrevCardId] = useState<string | undefined>(editingCard?.id);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+  // Reset dropdowns if modal opens or closes
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    setIsBankDropdownOpen(false);
+    setIsCardDropdownOpen(false);
+  }
 
   // Adjust form fields during render when editingCard changes (official React recommended pattern)
   if (editingCard?.id !== prevCardId) {
     setPrevCardId(editingCard?.id);
+    setIsBankDropdownOpen(false);
+    setIsCardDropdownOpen(false);
     if (editingCard) {
       setBankName(editingCard.bankName);
       setCardName(editingCard.cardName);
@@ -113,16 +123,18 @@ export const CardModal: React.FC<CardModalProps> = ({
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  // Auto-focus first input when modal opens
+  // Auto-focus first input ONLY on desktop when adding a new card
   useEffect(() => {
     if (!isOpen) return;
 
-    const timer = setTimeout(() => {
-      firstInputRef.current?.focus();
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+    // Never auto-focus when editing an existing card or on mobile devices (prevents unwanted keyboard popup)
+    if (!editingCard && window.innerWidth >= 768) {
+      const timer = setTimeout(() => {
+        firstInputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, editingCard]);
 
   // Handle Escape key dismissal
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -243,7 +255,12 @@ export const CardModal: React.FC<CardModalProps> = ({
               type="text"
               autoComplete="off"
               value={bankName}
-              onFocus={() => setIsBankDropdownOpen(true)}
+              onFocus={() => {
+                const isExactMatch = filteredBanks.length === 1 && filteredBanks[0].toLowerCase() === bankName.trim().toLowerCase();
+                if (!isExactMatch) {
+                  setIsBankDropdownOpen(true);
+                }
+              }}
               onChange={e => {
                 handleBankSelect(e.target.value);
                 setIsBankDropdownOpen(true);
@@ -300,7 +317,12 @@ export const CardModal: React.FC<CardModalProps> = ({
               type="text"
               autoComplete="off"
               value={cardName}
-              onFocus={() => setIsCardDropdownOpen(true)}
+              onFocus={() => {
+                const isExactMatch = matchingCards.length === 1 && matchingCards[0].cardName.toLowerCase() === cardName.trim().toLowerCase();
+                if (!isExactMatch) {
+                  setIsCardDropdownOpen(true);
+                }
+              }}
               onChange={e => {
                 handleCardNameSelect(e.target.value);
                 setIsCardDropdownOpen(true);
