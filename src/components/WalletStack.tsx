@@ -3,19 +3,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { CreditCard } from '../types/card';
 import { calculateBillingCycle } from '../utils/billingUtils';
-import { 
-  ChevronUp, 
-  ChevronLeft, 
-  ChevronRight, 
-  Star, 
-  Wifi, 
-  Sparkles, 
-  Clock, 
-  AlertTriangle, 
-  Plane, 
-  Eye, 
-  Edit3, 
-  Trash2, 
+import {
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Wifi,
+  Sparkles,
+  Clock,
+  AlertTriangle,
+  Plane,
+  Eye,
+  Edit3,
+  Trash2,
   RotateCw,
   Coins,
   Globe,
@@ -256,9 +256,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                     setActiveIndex(idx);
                   }
                 }}
-                className={`absolute inset-0 rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_16px_36px_rgba(0,0,0,0.75)] ring-1 ${
-                  offsetIndex === 0 ? 'ring-white/20' : 'ring-white/10 pointer-events-none sm:pointer-events-auto'
-                } flex flex-col justify-between`}
+                className={`absolute inset-0 rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_16px_36px_rgba(0,0,0,0.75)] ring-1 ${offsetIndex === 0 ? 'ring-white/20' : 'ring-white/10 pointer-events-none sm:pointer-events-auto'
+                  } flex flex-col justify-between`}
                 style={{
                   transform: `translateX(calc(${baseTranslatePercent}% + ${dragOffset}px)) scale(${scale})`,
                   transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease',
@@ -268,7 +267,7 @@ export const WalletStack: React.FC<WalletStackProps> = ({
               >
                 {/* Specular sheen */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.08] via-transparent to-black/20 pointer-events-none" />
-                
+
                 {/* Watermark Network */}
                 <div className="absolute right-4 bottom-2 opacity-15 text-5xl sm:text-6xl font-black select-none pointer-events-none uppercase tracking-tighter" aria-hidden="true">
                   {card.cardNetwork}
@@ -356,13 +355,12 @@ export const WalletStack: React.FC<WalletStackProps> = ({
               <div className="text-[10px] text-slate-300">Runway if spent today</div>
             </div>
           </div>
-          <div className={`px-2.5 py-1 rounded-xl text-xs font-black tabular-num tracking-wide shrink-0 border ${
-            activeCalc.floatDaysIfSpentToday >= 40
-              ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm'
-              : activeCalc.daysUntilStatement <= 3
+          <div className={`px-2.5 py-1 rounded-xl text-xs font-black tabular-num tracking-wide shrink-0 border ${activeCalc.floatDaysIfSpentToday >= 40
+            ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm'
+            : activeCalc.daysUntilStatement <= 3
               ? 'bg-rose-950/40 text-rose-300 border-rose-800/40'
               : 'bg-white/[0.06] text-white border-white/10'
-          }`}>
+            }`}>
             {activeCalc.floatDaysIfSpentToday} DAYS
           </div>
         </div>
@@ -376,9 +374,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
               <span className="text-[11px] font-medium">Statement Cut</span>
             </div>
             <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className={`text-sm font-bold tabular-num ${
-                activeCalc.daysUntilStatement <= 2 ? 'text-amber-400' : 'text-white'
-              }`}>
+              <span className={`text-sm font-bold tabular-num ${activeCalc.daysUntilStatement <= 2 ? 'text-amber-400' : 'text-white'
+                }`}>
                 {activeCalc.daysUntilStatement === 0 ? 'Today!' : `in ${activeCalc.daysUntilStatement}d`}
               </span>
               <span className="text-[11px] text-slate-400 tabular-num">
@@ -398,9 +395,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
               <span className="text-[11px] font-medium">Payment Due</span>
             </div>
             <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className={`text-sm font-bold tabular-num ${
-                activeCalc.daysUntilDue <= 3 ? 'text-rose-400 font-extrabold' : 'text-white'
-              }`}>
+              <span className={`text-sm font-bold tabular-num ${activeCalc.daysUntilDue <= 3 ? 'text-rose-400 font-extrabold' : 'text-white'
+                }`}>
                 {activeCalc.daysUntilDue === 0 ? 'Today!' : `in ${activeCalc.daysUntilDue}d`}
               </span>
               <span className="text-[11px] text-slate-400 tabular-num">
@@ -418,8 +414,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
               <span>Airport Lounge</span>
             </span>
             <span className="font-semibold text-white tabular-num">
-              {activeCard.benefits.domesticLounge.available 
-                ? `${activeCard.benefits.domesticLounge.countPerQuarter} Dom/qtr` 
+              {activeCard.benefits.domesticLounge.available
+                ? `${activeCard.benefits.domesticLounge.countPerQuarter} Dom/qtr`
                 : 'None'}
             </span>
           </div>
@@ -494,7 +490,7 @@ export const WalletStack: React.FC<WalletStackProps> = ({
           Scroll through all stacked cards vertically with zero page movement!
           ========================================================================= */}
       {isExpanded && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-[#070b14]/95 backdrop-blur-3xl flex flex-col animate-in fade-in slide-in-from-bottom duration-300"
           onTouchStart={handleDeckTouchStart}
           onTouchEnd={handleDeckTouchEnd}
@@ -545,7 +541,7 @@ export const WalletStack: React.FC<WalletStackProps> = ({
           </div>
 
           {/* Scrollable Overlapping Cards Deck */}
-          <div 
+          <div
             ref={deckScrollRef}
             className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-4 max-w-lg mx-auto w-full pb-36 no-scrollbar"
             style={{
@@ -561,9 +557,8 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                 <div
                   key={card.id}
                   onClick={() => handleSelectCardInDeck(idx)}
-                  className={`relative aspect-[1.586/1] w-full rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_12px_28px_rgba(0,0,0,0.7)] transition-all duration-300 hover:translate-y-[-8px] cursor-pointer active:scale-[0.99] ${
-                    isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_24px_rgba(245,158,11,0.3)]' : 'ring-1 ring-white/15'
-                  }`}
+                  className={`relative aspect-[1.586/1] w-full rounded-3xl p-4 sm:p-5 bg-gradient-to-tr ${getCardBg(card)} text-white overflow-hidden shadow-[0_12px_28px_rgba(0,0,0,0.7)] transition-all duration-300 hover:translate-y-[-8px] cursor-pointer active:scale-[0.99] ${isSelected ? 'ring-2 ring-amber-400 shadow-[0_0_24px_rgba(245,158,11,0.3)]' : 'ring-1 ring-white/15'
+                    }`}
                   style={{
                     // Consistent ~68px tab exposure on every screen size
                     marginTop: idx === 0 ? '0px' : '-135px',
@@ -602,14 +597,13 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border tabular-num ${
-                        cardCalc.floatDaysIfSpentToday >= 40
-                          ? 'bg-amber-400/25 text-amber-200 border-amber-400/40'
-                          : cardCalc.daysUntilDue <= 3
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border tabular-num ${cardCalc.floatDaysIfSpentToday >= 40
+                        ? 'bg-amber-400/25 text-amber-200 border-amber-400/40'
+                        : cardCalc.daysUntilDue <= 3
                           ? 'bg-rose-950/60 text-rose-300 border-rose-800/60'
                           : 'bg-black/40 text-slate-200 border-white/15'
-                      }`}>
-                        {cardCalc.daysUntilDue <= 3 
+                        }`}>
+                        {cardCalc.daysUntilDue <= 3
                           ? `Due in ${cardCalc.daysUntilDue}d`
                           : `${cardCalc.floatDaysIfSpentToday}d Float`}
                       </span>

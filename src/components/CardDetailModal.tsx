@@ -183,51 +183,88 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
 
             {/* Base Reward & Multipliers */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
-                <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400 mb-1">
-                  <Coins className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                  <span>Base Reward Return</span>
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-1.5">
+                    <Coins className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+                    <span>Base Reward Return</span>
+                  </div>
+                  <div className="flex items-baseline gap-1 my-1">
+                    <span className="text-2xl font-black tracking-tight text-white tabular-num leading-tight">
+                      {card.benefits.rewardRate.basePercent}%
+                    </span>
+                  </div>
                 </div>
-                <div className="text-2xl font-black text-white tabular-num">
-                  {card.benefits.rewardRate.basePercent}%
-                </div>
-                <div className="text-xs text-zinc-400 mt-1">
-                  {card.benefits.rewardRate.rewardPointsPer100 ? `${card.benefits.rewardRate.rewardPointsPer100} points per ₹100 spend` : 'Effective base value'}
-                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed mt-2 pt-2 border-t border-white/[0.05]">
+                  {card.benefits.rewardRate.rewardPointsPer100 ? `${card.benefits.rewardRate.rewardPointsPer100} points per ₹100 spend` : 'Effective base value across all spends'}
+                </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
-                <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400 mb-1">
-                  <Globe className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                  <span>Forex Markup Fee</span>
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-1.5">
+                    <Globe className="w-3.5 h-3.5 text-amber-400 shrink-0" aria-hidden="true" />
+                    <span>Forex Markup Fee</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5 my-1">
+                    <span className={`text-2xl font-black tracking-tight tabular-num leading-tight ${card.benefits.forexMarkup.ratePercent <= 2.0 ? 'text-amber-300' : 'text-white'}`}>
+                      {card.benefits.forexMarkup.ratePercent}%
+                    </span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                      + GST
+                    </span>
+                  </div>
                 </div>
-                <div className={`text-2xl font-black tabular-num ${card.benefits.forexMarkup.ratePercent <= 2.0 ? 'text-amber-300' : 'text-white'}`}>
-                  {card.benefits.forexMarkup.ratePercent}% + GST
-                </div>
-                <div className="text-xs text-zinc-400 mt-1">
+                <p className="text-[11px] text-slate-400 leading-relaxed mt-2 pt-2 border-t border-white/[0.05]">
                   {card.benefits.forexMarkup.details}
-                </div>
+                </p>
               </div>
             </div>
 
             {/* Cashback Highlights */}
             {card.benefits.cashbackHighlights && card.benefits.cashbackHighlights.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2.5">
-                  Category Cashback & Multipliers
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">
+                  Category Cashback &amp; Multipliers
                 </h4>
-                <div className="space-y-2">
-                  {card.benefits.cashbackHighlights.map((cb, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-between text-xs">
-                      <div>
-                        <div className="font-semibold text-white">{cb.category}</div>
-                        {cb.capsOrLimits && <div className="text-[11px] text-zinc-400">{cb.capsOrLimits}</div>}
+                <div className="space-y-2.5">
+                  {card.benefits.cashbackHighlights.map((cb, idx) => {
+                    // Extract clean primary rate and secondary condition if present
+                    const parenMatch = cb.rate.match(/^([^(]+)(\([^)]+\))$/);
+                    const primaryRate = parenMatch ? parenMatch[1].trim() : cb.rate;
+                    const subRate = parenMatch ? parenMatch[2].trim() : null;
+
+                    return (
+                      <div 
+                        key={idx} 
+                        className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/[0.06] hover:border-amber-400/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                      >
+                        <div className="flex-1 min-w-0 pr-2">
+                          <div className="font-semibold text-white text-xs leading-snug">
+                            {cb.category}
+                          </div>
+                          {cb.capsOrLimits && (
+                            <div className="text-[11px] text-slate-400 mt-1 leading-normal">
+                              {cb.capsOrLimits}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="shrink-0 self-start sm:self-center">
+                          <div className="inline-flex flex-col items-start sm:items-end">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-xl bg-amber-400/15 border border-amber-400/30 text-amber-300 font-bold text-xs tabular-num leading-none shadow-sm whitespace-nowrap">
+                              {primaryRate}
+                            </span>
+                            {subRate && (
+                              <span className="text-[10px] text-slate-400 mt-1 text-left sm:text-right max-w-xs leading-tight">
+                                {subRate}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <span className="font-bold text-amber-300 text-sm px-2.5 py-0.5 rounded-lg bg-amber-400/10 border border-amber-400/20 tabular-num">
-                        {cb.rate}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -235,21 +272,21 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
             {/* All Perks Detailed List */}
             {card.benefits.allPerks && card.benefits.allPerks.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2.5">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">
                   Detailed Perks Catalog
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {card.benefits.allPerks.map((perk, idx) => (
                     <div key={idx} className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold text-white">{perk.title}</span>
+                      <div className="flex items-center justify-between mb-1 gap-2">
+                        <span className="font-semibold text-white truncate">{perk.title}</span>
                         {perk.highlight && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20 shrink-0 whitespace-nowrap">
                             {perk.highlight}
                           </span>
                         )}
                       </div>
-                      <p className="text-zinc-400 leading-relaxed text-[11px]">{perk.description}</p>
+                      <p className="text-slate-400 leading-relaxed text-[11px]">{perk.description}</p>
                     </div>
                   ))}
                 </div>
