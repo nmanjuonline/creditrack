@@ -1,0 +1,22 @@
+# Cloudflare Pages Headers for CrediTrack PWA
+
+# Cache service worker and manifest with immediate update check
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/registerSW.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
+  Content-Type: application/manifest+json
+
+# Immutable static assets with content hash
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Global security headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
