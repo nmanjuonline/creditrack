@@ -11,9 +11,9 @@ import {
   Utensils, 
   Fuel, 
   Film, 
-  Sparkles,
   ChevronDown,
-  Check
+  Check,
+  CreditCard
 } from 'lucide-react';
 
 export type BenefitQuickFilter = 
@@ -46,7 +46,7 @@ interface BenefitFilterBarProps {
 }
 
 const FILTER_PILLS: { id: BenefitQuickFilter; label: string; icon: React.ReactNode }[] = [
-  { id: 'all', label: 'All Perks', icon: <Sparkles className="w-3.5 h-3.5" aria-hidden="true" /> },
+  { id: 'all', label: 'All Perks', icon: <CreditCard className="w-3.5 h-3.5" aria-hidden="true" /> },
   { id: 'lounge', label: 'Airport Lounge', icon: <Plane className="w-3.5 h-3.5" aria-hidden="true" /> },
   { id: 'cashback', label: 'Cashback & Returns', icon: <Percent className="w-3.5 h-3.5" aria-hidden="true" /> },
   { id: 'milestone', label: 'Milestones', icon: <Gift className="w-3.5 h-3.5" aria-hidden="true" /> },
@@ -119,15 +119,15 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
           <button
             type="button"
             onClick={() => setIsSortOpen(!isSortOpen)}
-            className="flex items-center gap-2 px-3.5 py-2.5 rounded-full glass-panel text-xs font-semibold text-slate-200 hover:text-white border border-white/10 shadow-sm transition-all active:scale-95 min-h-[44px]"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl glass-panel text-xs font-medium text-zinc-300 hover:text-white border border-white/10 shadow-sm transition-colors min-h-[40px]"
             aria-haspopup="listbox"
             aria-expanded={isSortOpen}
             aria-label={`Sort by: ${currentSortLabel}`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-slate-400">Sort:</span>
+            <span className="text-zinc-400">Sort:</span>
             <span className="text-white font-medium">{currentSortLabel}</span>
-            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isSortOpen && (
@@ -136,8 +136,8 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
               role="listbox"
               aria-label="Sort options"
             >
-              <div className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                Sort Cards By
+              <div className="px-3 py-1 text-[11px] font-medium text-zinc-400">
+                Sort cards by
               </div>
               {SORT_OPTIONS.map(opt => {
                 const isSelected = sortOption === opt.id;
@@ -149,10 +149,10 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
                       setSortOption(opt.id);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs text-left transition-colors min-h-[40px] ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs text-left transition-colors min-h-[38px] ${
                       isSelected
-                        ? 'bg-amber-400/20 text-amber-200 font-semibold'
-                        : 'text-slate-200 hover:bg-white/[0.08] hover:text-white'
+                        ? 'bg-amber-400/15 text-amber-200 font-medium'
+                        : 'text-zinc-300 hover:bg-white/[0.06] hover:text-white'
                     }`}
                     role="option"
                     aria-selected={isSelected}
@@ -173,10 +173,10 @@ export const BenefitFilterBar: React.FC<BenefitFilterBarProps> = ({
           <button
             key={pill.id}
             onClick={() => setActiveFilter(pill.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-95 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-colors min-h-[36px] ${
               activeFilter === pill.id
-                ? 'bg-amber-400/20 text-amber-200 border border-amber-400/40 shadow-sm'
-                : 'bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]'
+                ? 'bg-amber-400/15 text-amber-200 border border-amber-400/30 shadow-sm'
+                : 'bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]'
             }`}
           >
             {pill.icon}

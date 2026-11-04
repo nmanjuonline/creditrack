@@ -10,7 +10,7 @@ import {
   Fuel, 
   Gift, 
   AlertCircle, 
-  Sparkles, 
+  Clock, 
   CheckCircle2
 } from 'lucide-react';
 
@@ -166,9 +166,9 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
             {/* Summary Highlights */}
             {card.benefits.summaryPoints && card.benefits.summaryPoints.length > 0 && (
               <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-widest mb-2.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                  <span>Key Card Highlights</span>
+                <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 mb-2.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                  <span>Key card highlights</span>
                 </div>
                 <ul className="space-y-2">
                   {card.benefits.summaryPoints.map((point, idx) => (
@@ -190,7 +190,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                     <span>Base Reward Return</span>
                   </div>
                   <div className="flex items-baseline gap-1 my-1">
-                    <span className="text-2xl font-black tracking-tight text-white tabular-num leading-tight">
+                    <span className="text-2xl font-bold tracking-tight text-white tabular-num leading-tight">
                       {card.benefits.rewardRate.basePercent}%
                     </span>
                   </div>
@@ -207,7 +207,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                     <span>Forex Markup Fee</span>
                   </div>
                   <div className="flex items-baseline gap-1.5 my-1">
-                    <span className={`text-2xl font-black tracking-tight tabular-num leading-tight ${card.benefits.forexMarkup.ratePercent <= 2.0 ? 'text-amber-300' : 'text-white'}`}>
+                    <span className={`text-2xl font-bold tracking-tight tabular-num leading-tight ${card.benefits.forexMarkup.ratePercent <= 2.0 ? 'text-amber-300' : 'text-white'}`}>
                       {card.benefits.forexMarkup.ratePercent}%
                     </span>
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -419,12 +419,12 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
           <div className="space-y-4" role="tabpanel">
             <div className="p-4 rounded-2xl bg-amber-400/[0.08] border border-amber-400/25 text-xs">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-sm text-white flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                <span className="font-semibold text-sm text-white flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-amber-400" aria-hidden="true" />
                   <span>Current Float Status</span>
                 </span>
-                <span className="font-black text-amber-300 text-base tabular-num">
-                  {calc.floatDaysIfSpentToday} Days Free
+                <span className="font-bold text-amber-300 text-sm tabular-num">
+                  {calc.floatDaysIfSpentToday} days runway
                 </span>
               </div>
               <p className="text-zinc-300 leading-relaxed">

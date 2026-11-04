@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Star,
   Wifi,
-  Sparkles,
   Clock,
   AlertTriangle,
   Plane,
@@ -388,21 +387,21 @@ export const WalletStack: React.FC<WalletStackProps> = ({
         {/* Float Runway Banner */}
         <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.07]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-400/15 text-amber-300 flex items-center justify-center border border-amber-400/30 shrink-0">
-              <Sparkles className="w-4 h-4 text-amber-400" aria-hidden="true" />
+            <div className="w-8 h-8 rounded-xl bg-amber-400/10 text-amber-300 flex items-center justify-center border border-amber-400/20 shrink-0">
+              <Clock className="w-4 h-4 text-amber-400" aria-hidden="true" />
             </div>
             <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Interest-Free Float</div>
-              <div className="text-[10px] text-slate-300">Runway if spent today</div>
+              <div className="text-xs font-medium text-zinc-300">Interest-free float</div>
+              <div className="text-[11px] text-zinc-400">Runway if spent today</div>
             </div>
           </div>
-          <div className={`px-2.5 py-1 rounded-xl text-xs font-black tabular-num tracking-wide shrink-0 border ${activeCalc.floatDaysIfSpentToday >= 40
-            ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm'
+          <div className={`px-2.5 py-1 rounded-xl text-xs font-semibold tabular-num tracking-wide shrink-0 border ${activeCalc.floatDaysIfSpentToday >= 40
+            ? 'bg-amber-400/15 text-amber-200 border-amber-400/30 shadow-sm'
             : activeCalc.daysUntilStatement <= 3
               ? 'bg-rose-950/40 text-rose-300 border-rose-800/40'
               : 'bg-white/[0.06] text-white border-white/10'
             }`}>
-            {activeCalc.floatDaysIfSpentToday} DAYS
+            {activeCalc.floatDaysIfSpentToday} days
           </div>
         </div>
 
@@ -628,14 +627,14 @@ export const WalletStack: React.FC<WalletStackProps> = ({
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" aria-label="Favorite" />
                       )}
                       {isSelected && (
-                        <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[8px] font-black tracking-wider uppercase ml-1">
+                        <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[9px] font-bold ml-1">
                           Active
                         </span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border tabular-num ${cardCalc.floatDaysIfSpentToday >= 40
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border tabular-num ${cardCalc.floatDaysIfSpentToday >= 40
                         ? 'bg-amber-400/25 text-amber-200 border-amber-400/40'
                         : cardCalc.daysUntilDue <= 3
                           ? 'bg-rose-950/60 text-rose-300 border-rose-800/60'

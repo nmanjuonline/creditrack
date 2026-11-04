@@ -336,8 +336,8 @@ export const App: React.FC = () => {
         {activeTab === 'cards' && (
           <div>
             {isLoading ? (
-              <div className="flex items-center justify-center py-24 text-slate-400 gap-3" role="status" aria-live="polite">
-                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+              <div className="flex items-center justify-center py-24 text-zinc-400 gap-3" role="status" aria-live="polite">
+                <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" aria-hidden="true" />
                 <span className="text-sm font-medium">Loading your credit cards...</span>
               </div>
             ) : (

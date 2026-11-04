@@ -8,7 +8,6 @@ import {
   CloudOff, 
   Download, 
   Calendar as CalendarIcon, 
-  Sparkles,
   LayoutGrid,
   WifiOff,
   X
@@ -83,18 +82,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Logo & Brand in Luxury Gold/Obsidian */}
           <div className="flex items-center gap-3">
             <div 
-              className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 flex items-center justify-center shadow-lg shadow-amber-500/20 ring-1 ring-amber-300/40"
+              className="w-9 h-9 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-amber-400 shadow-sm"
               aria-hidden="true"
             >
-              <CardIcon className="w-4.5 h-4.5 text-slate-950" />
+              <CardIcon className="w-4.5 h-4.5" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-lg text-white tracking-tight">{CONFIG.APP.NAME}</span>
+              <span className="font-semibold text-lg text-white tracking-tight">{CONFIG.APP.NAME}</span>
               
               {/* Only show indicator if offline — clean, unobtrusive Apple convention */}
               {!isOnline && (
                 <span 
-                  className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse backdrop-blur-md"
+                  className="flex items-center gap-1.5 text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 backdrop-blur-md"
                   title="Offline mode: local cache active"
                   role="status"
                   aria-live="polite"
@@ -106,14 +105,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* iOS Segmented Control Navigation */}
-          <nav className="hidden md:flex items-center bg-black/40 backdrop-blur-2xl p-1 rounded-full border border-white/[0.08]" aria-label="Main Navigation">
+          {/* Segmented Control Navigation */}
+          <nav className="hidden md:flex items-center bg-zinc-950/80 p-1 rounded-xl border border-white/[0.08]" aria-label="Main Navigation">
             <button
               onClick={() => setActiveTab('cards')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'cards'
-                  ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/20 text-amber-200 shadow-sm border border-amber-400/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-zinc-800 text-white border border-white/10 shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               aria-current={activeTab === 'cards' ? 'page' : undefined}
             >
@@ -122,22 +121,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('float')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'float'
-                  ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/20 text-amber-200 shadow-sm border border-amber-400/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-zinc-800 text-amber-300 border border-white/10 shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               aria-current={activeTab === 'float' ? 'page' : undefined}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+              <CardIcon className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
               <span>Best Card Today</span>
             </button>
             <button
               onClick={() => setActiveTab('calendar')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 active:scale-95 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'calendar'
-                  ? 'bg-gradient-to-r from-amber-500/25 to-yellow-500/20 text-amber-200 shadow-sm border border-amber-400/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-zinc-800 text-white border border-white/10 shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               }`}
               aria-current={activeTab === 'calendar' ? 'page' : undefined}
             >
@@ -346,7 +345,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           aria-current={activeTab === 'float' ? 'page' : undefined}
         >
           <div className={`p-1 rounded-lg ${activeTab === 'float' ? 'bg-amber-400/15' : ''}`}>
-            <Sparkles className="w-5 h-5" aria-hidden="true" />
+            <CardIcon className="w-5 h-5" aria-hidden="true" />
           </div>
           <span className="text-[11px] tracking-tight mt-0.5">Best Card</span>
         </button>

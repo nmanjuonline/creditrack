@@ -9,7 +9,6 @@ import {
   Trash2, 
   Star, 
   AlertTriangle, 
-  Sparkles, 
   Clock, 
   Coins, 
   Globe, 
@@ -163,22 +162,22 @@ export const CreditCardItem: React.FC<CreditCardItemProps> = ({
         {/* Float Runway Banner */}
         <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.07]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-400/15 text-amber-300 flex items-center justify-center border border-amber-400/30 shrink-0">
-              <Sparkles className="w-4 h-4 text-amber-400" aria-hidden="true" />
+            <div className="w-8 h-8 rounded-xl bg-amber-400/10 text-amber-300 flex items-center justify-center border border-amber-400/20 shrink-0">
+              <Clock className="w-4 h-4 text-amber-400" aria-hidden="true" />
             </div>
             <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Interest-Free Float</div>
-              <div className="text-[10px] text-slate-300">Runway if spent today</div>
+              <div className="text-xs font-medium text-zinc-300">Interest-free float</div>
+              <div className="text-[11px] text-zinc-400">Runway if spent today</div>
             </div>
           </div>
-          <div className={`px-2.5 py-1 rounded-xl text-xs font-black tabular-num tracking-wide shrink-0 border ${
+          <div className={`px-2.5 py-1 rounded-xl text-xs font-semibold tabular-num tracking-wide shrink-0 border ${
             calc.floatDaysIfSpentToday >= 40
-              ? 'bg-amber-400/20 text-amber-200 border-amber-400/40 shadow-sm'
+              ? 'bg-amber-400/15 text-amber-200 border-amber-400/30 shadow-sm'
               : calc.daysUntilStatement <= 3
               ? 'bg-rose-950/40 text-rose-300 border-rose-800/40'
               : 'bg-white/[0.06] text-white border-white/10'
           }`}>
-            {calc.floatDaysIfSpentToday} DAYS
+            {calc.floatDaysIfSpentToday} days
           </div>
         </div>
 

@@ -206,7 +206,7 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
                 {/* Day Number Header: Apple iOS Calendar Style (Circle for Today, never overflows) */}
                 <div className="flex items-center justify-center sm:justify-between w-full">
                   {isToday ? (
-                    <span className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shadow-md tabular-num">
+                    <span className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center shadow-md tabular-num">
                       {day}
                     </span>
                   ) : (
@@ -215,8 +215,8 @@ export const BillingCalendar: React.FC<BillingCalendarProps> = ({ cards, onSelec
                     </span>
                   )}
                   {isToday && (
-                    <span className="hidden sm:inline text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-400/15 px-1.5 py-0.5 rounded">
-                      TODAY
+                    <span className="hidden sm:inline text-[10px] font-medium text-amber-300 bg-amber-400/15 px-1.5 py-0.5 rounded">
+                      Today
                     </span>
                   )}
                 </div>
